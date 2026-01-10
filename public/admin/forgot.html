@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mot de passe oublié — COR'BAT</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="auth-wrap">
+
+<div class="card" style="max-width:420px;margin:auto;">
+  <h3>Réinitialiser votre mot de passe</h3>
+  <p class="lead">Veuillez entrez votre email et nous vous enverrons un lien sécurisé.</p>
+
+  <form id="forgotForm">
+    <label for="email">Email</label>
+    <input type="email" id="email" required>
+    <button class="btn-primary" type="submit">Envoyer</button>
+  </form>
+
+  <div class="msg success" id="okMsg" style="display:none;"></div>
+  <div class="msg error" id="errMsg" style="display:none;"></div>
+</div>
+
+<script>
+const emailEl = document.getElementById("email");
+const okMsg = document.getElementById("okMsg");
+const errMsg = document.getElementById("errMsg");
+const form = document.getElementById("forgotForm");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  // Reset messages
+  okMsg.style.display = "none";
+  errMsg.style.display = "none";
+  okMsg.textContent = "";
+  errMsg.textContent = "";
+
+  try {
+    const res = await fetch("/api/auth/forgot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: emailEl.value.trim() })
+    });
+
+    // Try parse JSON (guard)
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok && data.success) {
+      okMsg.textContent = "✅ Email envoyé avec succès ! Veuillez vérifier votre boîte de réception.";
+      okMsg.style.display = "block";
+    } else {
+      errMsg.textContent = data.error || "❌ Une erreur est survenue.";
+      errMsg.style.display = "block";
+    }
+  } catch (err) {
+    console.error("Network error:", err);
+    errMsg.textContent = "❌ Impossible de joindre le serveur. Veuillez vérifier que le serveur est démarré.";
+    errMsg.style.display = "block";
+  }
+});
+</script>
+
+</body>
+</html>

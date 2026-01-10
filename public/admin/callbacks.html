@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Demandes de rappel — COR'BAT</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+  .container{max-width:1100px;margin:18px auto;}
+  .card{background:#fff;padding:16px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);}
+  .table{width:100%;border-collapse:collapse;}
+  .table th,.table td{padding:10px;border-bottom:1px solid #eee;text-align:left;}
+  .small-muted{color:#666;font-size:0.9rem;}
+  .btn{padding:8px 10px;border-radius:8px;border:0;cursor:pointer;}
+  .btn-ghost{background:rgb(0, 225, 255);border:1px solid #ddd;}
+  .btn-see { background:#000000; border:1px solid #ddd; color:#ffffff; }
+  .btn-delet { background:red; border:1px solid #ddd; color:#ffffff; }
+  .btn-primary{background:linear-gradient(90deg,#ffb400,#ff6b6b);color:#111;font-weight:700;}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">
+        <img src="../images/COR'BAT.png" alt="COR'BAT">
+      </span>
+      <span class="brand-name">Admin COR'BAT</span>
+    </div>  
+    <!-- ======== NAVIGATION ======== -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+      <a href="devis.html" class="nav-link">Liste devis</a>
+      <a href="leads.html" class="nav-link">Clients intéressés</a>
+      <a href="projects.html" class="nav-link">Projets récents</a>
+      <a href="services.html" class="nav-link">Nos services</a>
+      <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+      <div class="admin-actions">
+        <button id="btnLogout" class="btn-logout">Se déconnecter</button>
+      </div>
+    </nav> 
+  </header>
+  <!-- ======== STYLES (consolidés) ======== -->
+  <style>
+    /* === Header moderne === */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 40px;
+      background: linear-gradient(90deg,#000 0%, #000 100%);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+    /* Brand (logo + texte) */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .brand .logo img {
+      width: 48px;
+      height: auto;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .brand .brand-name {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      background: #ffffff;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand img { width:50px; height:auto; }
+    /* Nav alignée à droite */
+    .nav {
+      display: flex;
+      gap: 28px;
+      margin-left: auto; /* pousse le menu vers la droite */
+      align-items: center;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+      font-size: 1rem;
+      transition: color 0.25s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -6px;
+      left: 0;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      transition: width 0.25s ease;
+    }
+    .nav-link:hover {
+      color: #ffb400;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    /* Bouton Demander un devis */
+    .btn-devis {
+      padding: 8px 16px;
+      border-radius: 22px;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      color: #111;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(255,107,107,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-devis:hover {
+      transform: translateY(-2px);
+    }
+    /* Menu toggle (mobile) */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      margin-left: 12px;
+    }
+    .menu-toggle span {
+      width: 26px;
+      height: 3px;
+      background: #fff;
+      border-radius: 3px;
+    }
+    /* === Responsive === */
+    @media (max-width: 1024px) {
+      .nav {
+        display: none;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        background: #000;
+        flex-direction: column;
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        gap: 12px;
+        min-width: 200px;
+      }
+      .nav.active { display: flex; }
+      .menu-toggle { display: flex; }
+      .brand .brand-name { font-size: 1.1rem; }
+    }
+  </style>
+
+  <main class="container">
+    <div class="card">
+      <h1>Demandes de rappel</h1>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+        <input id="searchCb" placeholder="Rechercher par nom / téléphone..." style="flex:1;padding:8px;border:1px solid #e6e9ef;border-radius:8px;">
+        <select id="filterStatusCb" style="padding:8px;border-radius:8px;">
+          <option value="">Tous statuts</option>
+          <option value="nouvelle">nouvelle</option>
+          <option value="contactée">contactée</option>
+          <option value="traitée">traitée</option>
+        </select>
+        <button id="exportCb" class="btn btn-ghost">Exporter CSV</button>
+        <button id="clearCb" class="btn btn-delet">Supprimer tout</button>
+      </div>
+
+      <div style="overflow:auto;max-height:65vh;">
+        <table class="table" aria-describedby="listCallbacks">
+          <thead><tr><th>Nom</th><th>Téléphone</th><th>Moment souhaité le</th><th>Demande envoyé le</th><th>Statut</th><th>Actions</th></tr></thead>
+          <tbody id="callbacksTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (async function(){
+      const API_URL = "/api/callbacks";
+      const tbody = document.getElementById("callbacksTbody");
+      const searchEl = document.getElementById("searchCb");
+      const filterEl = document.getElementById("filterStatusCb");
+    
+      // Fonction pour formater la date/heure de manière lisible
+      function formatDateTime(isoString) {
+        if (!isoString) return "-";
+        const d = new Date(isoString);
+        const jour = String(d.getDate()).padStart(2, '0');
+        const mois = String(d.getMonth() + 1).padStart(2, '0');
+        const annee = d.getFullYear();
+        const heures = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return `${jour}/${mois}/${annee} à ${heures}h${minutes}`;
+      }
+    
+      async function fetchCallbacks(){
+        const res = await fetch(API_URL);
+        if(!res.ok) throw new Error("❌ Erreur lors du chargement des données");
+        return res.json();
+      }
+    
+      async function render(){
+        try{
+          const data = await fetchCallbacks();
+          const q = (searchEl.value||"").toLowerCase();
+          const f = (filterEl.value||"").toLowerCase();
+    
+          const filtered = data.filter(cb =>
+            (!q || (cb.name && cb.name.toLowerCase().includes(q)) || (cb.phone && cb.phone.toLowerCase().includes(q))) &&
+            (!f || (cb.status && cb.status.toLowerCase() === f))
+          );
+    
+          if(filtered.length === 0){
+            tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;color:#888;padding:15px'>Aucune demande trouvée.</td></tr>";
+            return;
+          }
+    
+          tbody.innerHTML = filtered.map(cb => `
+            <tr data-id="${cb.id}">
+              <td>${cb.name || '-'}</td>
+              <td>${cb.phone || '-'}</td>
+              <td>${formatDateTime(cb.preferred_time)}</td>
+              <td>${formatDateTime(cb.created_at)}</td>
+              <td>
+                <select class="status-select">
+                  <option value="nouvelle" ${cb.status==='nouvelle'?'selected':''}>nouvelle</option>
+                  <option value="contactée" ${cb.status==='contactée'?'selected':''}>contactée</option>
+                  <option value="traitée" ${cb.status==='traitée'?'selected':''}>traitée</option>
+                </select>
+              </td>
+              <td>
+                <button class="btn btn-see view-btn">Voir</button>
+                <button class="btn btn-delet del-btn">Supprimer</button>
+              </td>
+            </tr>
+          `).join("");
+    
+          // Boutons
+          tbody.querySelectorAll(".view-btn").forEach(b=>b.addEventListener("click",onView));
+          tbody.querySelectorAll(".del-btn").forEach(b=>b.addEventListener("click",onDelete));
+          tbody.querySelectorAll(".status-select").forEach(s=>s.addEventListener("change",onStatusChange));
+    
+        }catch(err){
+          console.error(err);
+          tbody.innerHTML = `<tr><td colspan="6" style="color:red;text-align:center;">❌ Erreur chargement : ${err.message}</td></tr>`;
+        }
+      }
+    
+      async function onDelete(e){
+        const tr = e.target.closest("tr");
+        const id = tr.dataset.id;
+        if(!confirm("Voulez=vous vraiment supprimer cette demande ?")) return;
+        try {
+          const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+          const data = await res.json();
+          if(!res.ok || !data.success) throw new Error(data.error || "❌ Erreur serveur");
+          alert("✅ Demande supprimé avec succès !");
+          render();
+        } catch(err) {
+          alert("❌ " + err.message);
+        }
+      }
+    
+      async function onView(e){
+        const tr = e.target.closest("tr");
+        const id = tr.dataset.id;
+        const res = await fetch(`${API_URL}`);
+        const data = await res.json();
+        const cb = data.find(x=>x.id===id);
+        if(!cb) return alert("❌Introuvable");
+        alert(
+          `Nom : ${cb.name}\nTéléphone : ${cb.phone}\n` +
+          `Moment souhaité le : ${formatDateTime(cb.preferred_time)}\n` +
+          `Demande envoyé le : ${formatDateTime(cb.created_at)}\n` +
+          `Statut : ${cb.status}`
+        );
+      }
+    
+      async function onStatusChange(e){
+        const tr = e.target.closest("tr");
+        const id = tr.dataset.id;
+        const newStatus = e.target.value;
+        try {
+          const res = await fetch(`${API_URL}/${id}`, {
+            method: "PATCH",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ status: newStatus })
+          });
+          const data = await res.json();
+          if(!res.ok || !data.success) throw new Error(data.error || "❌Erreur serveur");
+          render();
+        } catch(err) {
+          alert("❌ " + err.message);
+        }
+      }
+    
+      // Suppression totale
+      document.getElementById("clearCb").addEventListener("click", async()=>{
+        if(!confirm("Voulez-vous vraiment supprimer toutes les demandes ?")) return;
+        const all = await fetchCallbacks();
+        for(const cb of all){ await fetch(`${API_URL}/${cb.id}`, { method:"DELETE" }); }
+        alert("✅ Tous les demandes ont été supprimés avec succès !");
+        render();
+      });
+    
+      // Export CSV
+      document.getElementById("exportCb").addEventListener("click", async()=>{
+        const data = await fetchCallbacks();
+        if(data.length===0) return alert("Aucune donnée à exporter.");
+        const header = ["Nom","Téléphone","Moment souhaité le","Statut","Demande envoyé le"];
+        const rows = data.map(cb => [cb.name, cb.phone, formatDateTime(cb.preferred_time), cb.status, formatDateTime(cb.created_at)].map(v=>`"${v||''}"`).join(","));
+        const csv = [header.join(","), ...rows].join("\n");
+        const blob = new Blob([csv], { type:"text/csv" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "Demande_Rappel.csv";
+        a.click();
+      });
+    
+      // Recherche et filtre
+      searchEl.addEventListener("input", render);
+      filterEl.addEventListener("change", render);
+    
+      // Initial
+      render();
+    
+    })();
+    </script>
+
+  <!-- ========== Admin Footer ========== -->
+  <footer class="admin-footer" role="contentinfo" aria-label="Pied de page administration">
+    <div class="admin-footer-inner">
+      <div class="admin-left">
+        <div class="admin-brand">
+          <img src="../images/COR'BAT.png" alt="COR'BAT" />
+          <div>
+            <strong>Admin COR'BAT</strong>
+            <div class="small muted">Espace administrateur</div>
+          </div>
+        </div>
+  
+        <div class="admin-contact dev-credit">
+          <div>Développé par : <strong>Kenny R.</strong></div>
+          <div>Tél : <a href="tel:+261331916764">+261 33 19 167 64</a></div>
+          <div>Email : <a href="mailto:ramarielina2604@gmail.com">ramarielina2604@gmail.com</a></div>
+        </div>      
+      </div>
+  
+      <div class="admin-right">
+        <nav class="admin-links" aria-label="Liens utilitaires admin">
+          <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+          <a href="devis.html" class="nav-link">Devis</a>
+          <a href="leads.html" class="nav-link">Clients</a>
+          <a href="projects.html" class="nav-link">Projets</a>
+          <a href="services.html" class="nav-link">Services</a>
+          <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+        </nav>
+      </div>
+    </div>
+  
+    <div class="admin-footer-bottom">
+      <small>© <span id="adminYear"></span> COR'BAT — Espace Admin • Tous droits réservés.</small>
+    </div>
+  </footer>
+  
+  <!-- ====== Styles pour admin-footer ====== -->
+  <style>
+    .admin-footer {
+      background:#070707;
+      color:#e6e6e6;
+      padding:18px 24px;
+      border-top:1px solid rgba(255,255,255,0.04);
+      font-family: 'Poppins', sans-serif;
+      margin-top:32px;
+    }
+    .admin-footer-inner {
+      display:flex;
+      gap:20px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .admin-left { display:flex; gap:14px; align-items:center; min-width:200px; }
+    .admin-brand img { width:44px; height:44px; object-fit:contain; border-radius:8px; }
+    .admin-brand strong { display:block; color:#fff; }
+    .small { font-size:0.87rem; }
+    .muted { color:#a9a9a9; }
+    .admin-center { flex:1; display:flex; justify-content:center; }
+    .kpis { display:flex; gap:22px; align-items:center; }
+    .kpi { text-align:center; min-width:88px; }
+    .kpi-value { font-weight:700; font-size:1.25rem; color:linear-gradient(90deg,#ffb400,#ff6b6b); }
+    .kpi-label { font-size:0.85rem; color:#bdbdbd; }
+    .admin-right { display:flex; gap:14px; align-items:center; min-width:220px; justify-content:flex-end; }
+    .admin-links { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .admin-links a { color:#dfe6ef; text-decoration:none; font-size:0.95rem; padding:6px 8px; border-radius:6px; }
+    .admin-links a:hover { background:rgba(255,255,255,0.02); color:#fff; }
+    .admin-actions { display:flex; gap:8px; align-items:center; }
+    .btn-ghost.small { padding:6px 10px; background:transparent; color:#ccc; border:1px solid rgba(255,255,255,0.03); border-radius:8px; cursor:pointer; }
+    .btn-logout { background:#ef4444; color:#ffffff; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
+    .admin-footer-bottom { text-align:center; margin-top:12px; color:#9a9a9a; font-size:0.88rem; border-top:1px solid rgba(255,255,255,0.02); padding-top:10px; }
+    .dev-credit {
+      position: fixed;
+      bottom: 10px;
+      right: 14px;
+      font-size: 0.68rem;
+      opacity: 0.25;
+      color: #ffffff; /* si fond clair → change en #555 */
+      line-height: 1.25;
+      text-align: right;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 9999;
+    }
+    .dev-credit a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .dev-credit:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    /* Responsive */
+    @media (max-width:880px){
+      .admin-footer-inner { flex-direction:column; align-items:stretch; gap:12px; }
+      .admin-center { order:3; justify-content:space-between; }
+      .admin-right { justify-content:space-between; }
+    }
+  </style>
+  
+  <script>
+    (function(){
+      // Mise à jour de l'année footer
+      document.getElementById('adminYear').textContent = new Date().getFullYear();
+    
+      // Déconnexion via backend (efface cookie)
+      const btnLogout = document.getElementById('btnLogout');
+      if (btnLogout) {
+        btnLogout.addEventListener('click', async function(){
+          if(!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
+    
+          await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include"
+          });
+    
+          // Nettoyage des ancien restes locaux (optionnel mais propre)
+          localStorage.removeItem('btp_admin_logged');
+          localStorage.removeItem('btp_admin_token');
+          sessionStorage.removeItem('btp_admin_logged');
+          sessionStorage.removeItem('btp_admin_token');
+    
+          window.location.href = "login.html";
+        });
+      }
+    
+      // Bouton vider cache (ne touche pas l’auth)
+      const btnClearCache = document.getElementById('btnClearCache');
+      if (btnClearCache){
+        btnClearCache.addEventListener('click', function(){
+          if(!confirm('Vider les données d’images ?')) return;
+          localStorage.removeItem('projectImages');
+          alert('Cache images supprimé.');
+          document.dispatchEvent(new Event('projectImagesCleared'));
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

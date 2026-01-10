@@ -1,0 +1,2072 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Accueil — COR'BAT</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">
+        <img src="images/COR'BAT.png" alt="COR'BAT">
+      </span>
+      <span class="brand-name">COR'BAT</span>
+    </div>
+    <!-- ======== NAVIGATION ======== -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <a href="index.html" class="nav-link">Accueil</a>
+      <a href="services.html" class="nav-link">Services</a>
+      <a href="portfolio.html" class="nav-link">Portfolio</a>
+      <a href="devis.html" class="nav-link">Demander un devis</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+      <a href="about.html" class="nav-link">À propos</a>
+      <!-- Lien Admin (invisible par défaut) -->
+      <a href="admin/login.html"
+         class="nav-link admin-link"
+         id="adminMenu"
+         style="display:none;"
+         aria-hidden="true"
+         tabindex="-1">Admin</a>
+    </nav>
+  </header>
+  <!-- ======== STYLES (consolidés) ======== -->
+  <style>
+    /* === Header moderne === */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 40px;
+      background: linear-gradient(90deg,#000 0%, #000 100%);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+    /* Brand (logo + texte) */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .brand .logo img {
+      width: 48px;
+      height: auto;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    /* Degradé sur le texte de la marque (jaune/orange) */
+    .brand .brand-name {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      background: #ffffff;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    /* Nav alignée à droite */
+    .nav {
+      display: flex;
+      gap: 28px;
+      margin-left: auto; /* pousse le menu vers la droite */
+      align-items: center;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+      font-size: 1rem;
+      transition: color 0.25s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -6px;
+      left: 0;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      transition: width 0.25s ease;
+    }
+    .nav-link:hover {
+      color: #ffb400;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    /* Bouton Demander un devis */
+    .btn-devis {
+      padding: 8px 16px;
+      border-radius: 22px;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      color: #111;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(255,107,107,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-devis:hover {
+      transform: translateY(-2px);
+    }
+    /* Style spécial pour le lien Admin (quand visible) */
+    .admin-link {
+      color: #ff6b6b;
+      font-weight: 700;
+      border: 1px solid rgba(255,107,107,0.25);
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+    }
+    .admin-link:hover {
+      background: #ff6b6b;
+      color: white;
+    }
+    /* Menu toggle (mobile) */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      margin-left: 12px;
+    }
+    .menu-toggle span {
+      width: 26px;
+      height: 3px;
+      background: #fff;
+      border-radius: 3px;
+    }
+    /* === Responsive === */
+    @media (max-width: 1024px) {
+      .nav {
+        display: none;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        background: #000;
+        flex-direction: column;
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        gap: 12px;
+        min-width: 200px;
+      }
+      .nav.active { display: flex; }
+      .menu-toggle { display: flex; }
+      .brand .brand-name { font-size: 1.1rem; }
+    }
+  </style>
+  <!-- ======== SCRIPT DE PROTECTION CTRL + A (sans localStorage) ======== -->
+  <script>
+    (function () {
+    
+      const adminPassword = "MotDePasseCorbatAdministration"; // ton mot de passe d'accès secret
+      const DISPLAY_DURATION_MS = 60_000; // durée d'affichage 1 min
+    
+      let hideAdminTimeout = null;
+    
+      const adminMenu = document.getElementById('adminMenu');
+      const nav = document.querySelector('.nav');
+      const menuToggle = document.getElementById('menuToggle');
+    
+      // Cacher par défaut
+      const hideAdmin = () => {
+        if (!adminMenu) return;
+        adminMenu.style.display = 'none';
+        adminMenu.setAttribute('aria-hidden', 'true');
+        adminMenu.setAttribute('tabindex', '-1');
+      };
+    
+      const showAdmin = () => {
+        if (!adminMenu) return;
+        adminMenu.style.display = 'inline-block';
+        adminMenu.setAttribute('aria-hidden', 'false');
+        adminMenu.setAttribute('tabindex', '0');
+    
+        /* Effacer toute trace d’auth locale (au cas où) */
+        localStorage.removeItem('btp_admin_logged');
+        localStorage.removeItem('btp_admin_token');
+        sessionStorage.removeItem('btp_admin_token');
+      };
+    
+      hideAdmin(); // caché au démarrage
+    
+      // Cliquer → masque directement
+      adminMenu?.addEventListener('click', () => {
+        hideAdmin();
+        if (hideAdminTimeout) clearTimeout(hideAdminTimeout);
+      });
+    
+      // Empêcher focus si caché
+      adminMenu?.addEventListener('keydown', (e) => {
+        if (adminMenu.style.display === 'none') e.preventDefault();
+      });
+    
+      // demande mot de passe → affiche menu temporairement
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'b') {
+          e.preventDefault(); // empêche "la fonctionnaliter par defaut"
+          const pass = prompt("🔐 Entrer le mot de passe administrateur :");
+          if (pass === adminPassword) {
+    
+            showAdmin();
+    
+            if (hideAdminTimeout) clearTimeout(hideAdminTimeout);
+            hideAdminTimeout = setTimeout(() => {
+              hideAdmin();
+              alert("⌛ Lien admin caché automatiquement.");
+            }, DISPLAY_DURATION_MS);
+    
+            alert("✅ Lien admin activé temporairement !");
+          } else {
+            alert("⛔ Mot de passe incorrect.");
+          }
+        }
+      });
+    
+      // Menu responsive
+      if (menuToggle && nav) {
+        menuToggle.addEventListener('click', () => {
+          nav.classList.toggle('active');
+        });
+      }
+    
+    })();
+  </script>
+  
+  <main>
+    <section class="hero container">
+      <!-- Logo unique animé en puzzle -->
+      <div class="hero-bg">
+        <img src="images/Corbatfond.png" alt="COR'BAT" class="hero-bg-logo" id="puzzleLogo">
+      </div>
+    
+      <div class="hero-left">
+        <h1><span class="accent">Ensemble, bâtissons l'édifice de vos rêves.</span></h1>
+        <p class="lead">L’excellence en maîtrise technique, la précision dans chaque détail, et une livraison toujours ponctuelle.</p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="devis.html">Demander un devis</a>
+          <a class="btn-secondary" href="#services">Voir nos services</a>
+        </div>
+      </div>
+    
+      <div class="hero-right card">
+        <div class="mini-title">Aperçu rapide</div>
+        <div class="mini-row">
+          <div>Projets en cours</div>
+          <div class="mini-kpi" id="projectCount">20</div>
+        </div>
+    
+        <div class="carousel-container">
+          <div class="carousel-track" id="carouselTrack"></div>
+          <div class="carousel-buttons">
+            <button class="carousel-button" id="prev">&#10094;</button>
+            <button class="carousel-button" id="next">&#10095;</button>
+          </div>
+        </div>
+      </div>
+    
+      <style>
+        .hero {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: relative;
+          padding: 80px 40px;
+          overflow: hidden;
+          min-height: 600px;
+          background: linear-gradient(135deg, #f9fafb, #e3e7ef);
+          border-radius: 20px;
+        }
+        /* Logo animé en puzzle vertical */
+        .hero-bg {
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          overflow: hidden;
+          z-index: 0;
+          pointer-events: none;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .hero-bg-logo {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          position: relative;
+          opacity: 0.25;
+          clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%); /* initialement invisible */
+        }
+        .hero-left { z-index: 1; max-width: 50%; }
+        .hero-left h1 { font-size: 3rem; font-weight: 700; line-height: 1.2; margin-bottom: 20px; color: #111; }
+        .accent {
+          background: #000000;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .hero-left .lead { font-size: 1.2rem; margin-bottom: 30px; color: #333; }
+        .hero-actions a {
+          padding: 12px 30px;
+          border-radius: 50px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          text-decoration: none;
+          display: inline-block;
+          margin-right: 15px;
+        }
+        .btn-primary {
+          background: linear-gradient(45deg,#ff6b6b,#f06595);
+          color: white;
+          border: 2px solid #ff6b6b;
+        }
+        .btn-primary:hover { transform: scale(1.05); box-shadow: 0 10px 25px rgba(255,107,107,0.4); }
+        .btn-secondary {
+          background: #fff;
+          color: #ff6b6b;
+          border: 2px solid #ff6b6b;
+        }
+        .btn-secondary:hover { background: #ff6b6b; color: #fff; }
+        .btn-envoyer {
+          background: rgb(39, 165, 39);
+          color: #ffffff;
+          border: none;
+          padding: 12px 30px;
+          border-radius: 12px;
+          font-size: 15px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: 0.3s;
+        }
+        .btn-envoyer:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 18px rgba(6, 150, 1, 0.582);
+        }
+        .hero-right {
+          background: #fff;
+          padding: 25px;
+          border-radius: 20px;
+          box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+          z-index: 1;
+          min-width: 300px;
+        }
+        .mini-title { font-weight: 600; margin-bottom: 15px; font-size: 1.2rem; }
+        .mini-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: 500; font-size: 1rem; }
+        .mini-kpi { font-size: 1.5rem; color: #ff6b6b; font-weight: 700; }
+        .carousel-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; margin-top: 12px; }
+        .carousel-track { display: flex; transition: transform 0.8s ease-in-out; }
+        .carousel-track img { width: 100%; border-radius: 12px; flex-shrink: 0; object-fit: cover; }
+        .carousel-buttons {
+          position: absolute; top: 50%; width: 100%; display: flex;
+          justify-content: space-between; transform: translateY(-50%); pointer-events: none;
+        }
+        .carousel-button {
+          background: rgba(0,0,0,0.4);
+          color: white; border: none; border-radius: 50%; font-size: 1.4rem;
+          width: 38px; height: 38px; cursor: pointer; pointer-events: all; transition: background 0.3s;
+        }
+        .carousel-button:hover { background: rgba(0,0,0,0.8); }
+        @media (max-width: 992px){
+          .hero { flex-direction: column; padding: 40px 20px; }
+          .hero-left, .hero-right { max-width: 100%; margin-bottom: 30px; }
+        }
+      </style>
+    
+      <script>
+        /* === Animation du logo (inchangée) === */
+        const logo = document.getElementById('puzzleLogo');
+        const pieces = 12;
+        let currentPiece = 0;
+        
+        function animatePiece() {
+          currentPiece++;
+          const percent = (currentPiece / pieces) * 100;
+          logo.style.clipPath = `polygon(0% 0%, 100% 0%, 100% ${percent}%, 0% ${percent}%)`;
+        
+          if (currentPiece < pieces) {
+            setTimeout(animatePiece, 500 + Math.random() * 300);
+          } else {
+            setTimeout(() => { currentPiece = 0; animatePiece(); }, 2000);
+          }
+        }
+        animatePiece();
+        
+        
+        /* === CAROUSEL IMAGES (serveur) === */
+        (async function(){
+          const track = document.getElementById("carouselTrack");
+        
+          try {
+            const res = await fetch("/api/uploads-public");
+            const images = await res.json();
+        
+            track.innerHTML = ""; // réinitialiser
+        
+            if (!images.length) {
+              track.innerHTML = "<p style='padding:20px;text-align:center;'>Aucun projet disponible pour le moment.</p>";
+              return;
+            }
+        
+            images.forEach(img => {
+              const i = document.createElement("img");
+              i.src = img.url;
+              i.alt = "Projet";
+              track.appendChild(i);
+            });
+        
+            let index = 0;
+            const updateCarousel = () => track.style.transform = `translateX(-${index * 100}%)`;
+        
+            document.getElementById("next").onclick = () => { index = (index + 1) % images.length; updateCarousel(); };
+            document.getElementById("prev").onclick = () => { index = (index - 1 + images.length) % images.length; updateCarousel(); };
+        
+            setInterval(() => { index = (index + 1) % images.length; updateCarousel(); }, 4000);
+        
+          } catch(err) {
+            console.error("Erreur chargement carousel:", err);
+          }
+        })();
+        
+        
+        /* === Nombre de projets en cours (API Stats) === */
+        (async function(){
+          const res = await fetch("/api/stats");
+          const stats = await res.json();
+          document.getElementById("projectCount").textContent = stats.projects;
+        })();
+      </script>
+    </section>
+    <!-- ========================= SERVICES ========================= -->
+    <section id="services" class="animate-section container">
+      <h2 class="section-title">Nos services</h2>
+      <p class="section-sub">Des solutions haut de gamme et entièrement intégrées pour la conception, la réalisation et la valorisation de vos maisons et bâtiments.</p>
+
+      <div class="grid-2">
+        <article class="card service-card">
+          <img 
+            src="images/etudesarchitecturales.jpg" 
+            alt="Études & Conception">
+          <h3>Études & Conception</h3>
+          <ul>
+            <li>Études architecturales (plans, esquisses, avant-projets)</li>
+            <li>Études techniques (structure béton, métallique, bois)</li>
+            <li>Études de faisabilité et d’implantation </li>
+            <li>Modélisation 2D / 3D (AutoCAD, Revit, BIM) </li>
+            <li>Études géotechniques (sols et fondations) </li>
+            <li>Études thermiques et acoustiques  </li>
+            <li>Devis descriptif, quantitatif, estimatif  </li>
+          </ul>
+          <div class="card-actions">
+            <button class="btn-interested btn-primary" data-service="Études & Conception">Je suis intéressé</button>
+          </div>
+        </article>
+
+        <article class="card service-card">
+          <img 
+            src="images/grosoeuvre.jpg" 
+            alt="Travaux de Construction">
+          <h3>Travaux de Construction</h3>
+          <ul>
+            <li>Construction de bâtiments résidentiels (villa, immeubles) </li>
+            <li>Construction de bâtiments commerciaux et industriels </li>
+            <li>Gros œuvre (fondations, dalles, poteaux, murs) </li>
+            <li>Second œuvre (cloisons, enduits, revêtements) </li>
+            <li>Travaux de charpente (béton, métallique, bois) </li>
+            <li>Travaux de maçonnerie générale </li>
+          </ul>
+          <div class="card-actions">
+            <button class="btn-interested btn-primary" data-service="Travaux de Construction">Je suis intéressé</button>
+          </div>
+        </article>   
+
+        <article class="card service-card">
+          <img 
+            src="images/InstallationsTechniques.png" 
+            alt="Installations Techniques">
+          <h3>Installations Techniques</h3>
+          <ul>
+            <li>Électricité bâtiment (courant fort et faible) </li>
+            <li>Plomberie et assainissement </li>
+            <li>Climatisation et ventilation </li>
+            <li>Systèmes incendie (détection, extincteurs, sprinklers) </li>
+            <li>Réseaux informatiques et télécommunications </li>
+            <li>Domotique et systèmes de sécurité (caméras, contrôle d’accès) </li>
+          </ul>
+          <div class="card-actions">
+            <button class="btn-interested btn-primary" data-service="Installations Techniques">Je suis intéressé</button>
+          </div>
+        </article> 
+
+        <article class="card service-card">
+          <img 
+            src="images/finition.png" 
+            alt="Finitions & Aménagement">
+          <h3>Finitions & Aménagement</h3>
+          <ul>
+            <li>Peinture et décoration </li>
+            <li>Carrelage, faïence, parquet </li>
+            <li>Faux plafonds et cloisons </li>
+            <li>Menuiserie aluminium et PVC </li>
+            <li>Aménagement intérieur et extérieur </li>
+            <li>Etanchéité </li>
+            <li>Enduit Bessier & Crépi </li>
+            <li>Ouvrages Métalliques </li>
+          </ul>
+          <div class="card-actions">
+            <button class="btn-interested btn-primary" data-service="Finitions & Aménagement">Je suis intéressé</button>
+          </div>
+        </article> 
+
+        <article class="card service-card">
+          <img 
+            src="images/Gestion&SuivideProjet.png" 
+            alt="Gestion & Suivi de Projet">
+          <h3>Gestion & Suivi de Projet</h3>
+          <ul>
+            <li>Maîtrise d’œuvre </li>
+            <li>Planification et coordination des travaux </li>
+            <li>Suivi de chantier et contrôle qualité </li>
+            <li>Gestion des sous-traitants </li>
+            <li>Réception des travaux et levée des réserves </li>
+          </ul>
+          <div class="card-actions">
+            <button class="btn-interested btn-primary" data-service="Gestion & Suivi de Projet">Je suis intéressé</button>
+          </div>
+        </article>
+
+        <article class="card service-card">
+          <img 
+            src="images/Demarchesadministratives.png" 
+            alt="Démarches Administratives">
+          <h3>Démarches Administratives</h3>
+          <ul>
+            <li>Dossiers de permis de construire </li>
+            <li>Dossiers d’autorisation administrative </li>
+            <li>Études réglementaires (normes locales, sécurité) </li>
+            <li>Assistance à la conformité et réception officielle </li>
+          </ul>
+          <div class="card-actions">
+            <button class="btn-interested btn-primary" data-service="Démarches Administratives">Je suis intéressé</button>
+          </div>
+        </article>
+
+        <article class="card service-card">
+          <img 
+            src="images/Rehabilitation&Maintenance.png" 
+            alt="Réhabilitation & Maintenance">
+          <h3>Réhabilitation & Maintenance</h3>
+          <ul>
+            <li>Rénovation et réhabilitation de bâtiments </li>
+            <li>Réparation structurelle </li>
+            <li>Mise aux normes (sécurité, électricité) </li>
+            <li>Maintenance préventive et corrective </li>
+            <li>Extension et surélévation de bâtiments </li>
+          </ul>
+          <div class="card-actions">
+            <button class="btn-interested btn-primary" data-service="Réhabilitation & Maintenance">Je suis intéressé</button>
+          </div>
+        </article>
+
+        <article class="card service-card">
+          <img 
+            src="images/ServicesSpecialises.png" 
+            alt="Services Spécialisés">
+          <h3>Services Spécialisés</h3>
+          <ul>
+            <li>Construction écologique et durable </li>
+            <li>Optimisation énergétique </li>
+            <li>Études parasismiques </li>
+            <li>Construction modulaire et préfabriquée </li>
+            <li>Audit technique de bâtiments existants </li>
+            <li>Création de peinture de choix </li>
+            <li>Création de décoration à base de plâtre </li>
+            <li>Piscine</li>
+          </ul>
+          <div class="card-actions">
+            <button class="btn-interested btn-primary" data-service="Services Spécialisés">Je suis intéressé</button>
+          </div>
+        </article>
+
+        <article class="card service-card service-premium" data-service-id="svc_fab_peinture">
+          <div class="svc-media">
+            <span class="svc-badge">CLÉ-EN-MAIN</span>
+            <img 
+              src="images/cleenmain.png" 
+              alt="CLÉ-EN-MAIN"
+              class="svc-hero">
+          </div>
+        
+          <div class="svc-content">
+            <h3 class="svc-title">CLÉ-EN-MAIN</h3>
+        
+            <p class="svc-features">
+              Nous proposons des solutions de construction clé-en-main, assurant la prise en charge complète de votre projet, de la conception à la remise des clés, avec un haut niveau de qualité, de conformité et de respect des délais.
+            </p>
+        
+            <div class="card-actions">
+              <button class="btn-interested btn-primary">Je suis intéressé</button>
+              <button class="btn-ghost btn-detail">Voir le détail</button>
+            </div>
+          </div>
+        </article>        
+      </div>
+    </section>
+
+    <!-- Modal template for service details -->
+    <template id="serviceDetailTpl">
+      <div class="service-detail-backdrop" role="dialog" aria-modal="true">
+        <div class="service-detail" role="document">
+          <div class="detail-media">
+            <div class="detail-gallery"><img id="detailHero" src="" alt=""></div>
+            <div class="detail-thumbs" id="detailThumbs"></div>
+          </div>
+          <div class="detail-body">
+            <button id="detailClose" style="float:right;background:none;border:0;font-size:22px;cursor:pointer">&times;</button>
+            <h2 id="detailTitle" style="font-size:1.6rem"></h2>
+            <div class="muted" id="detailLead" style="margin-bottom:12px;color:#666"></div>
+            <div id="detailDesc" class="detail-rich"></div>            
+
+            <div class="detail-cta">
+              <button id="detailInterestBtn" class="btn btn-primary">Je suis intéressé</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <style>
+      /* FORCER 2 COLONNES — PRIORITÉ MAX */
+      .grid-2 {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        grid-auto-flow: row !important;
+        gap: 26px !important;
+        width: 100% !important;
+      }
+
+      /* ANNULER TOUT COMPORTEMENT EXTERNE */
+      .grid-2 > * {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      /* ANNULER COLONNES CSS SI EXISTANTES */
+      .grid-2 {
+        column-count: unset !important;
+        column-gap: unset !important;
+      }
+
+      /* MOBILE */
+      @media (max-width: 980px) {
+        .grid-2 {
+          grid-template-columns: 1fr !important;
+        }
+      }
+      /* zone pleine largeur POUR LES CARDS */
+      .services-full {
+        width: 100%;
+        padding: 0 40px; /* respiration */
+        box-sizing: border-box;
+      }
+      /* Grid 2 colonnes: assure alignement et colonnes égales */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 26px;
+        align-items: stretch;
+        width: 100%;
+      }
+      /* carte standard: occupe toute la hauteur de sa cellule */
+      .card.service-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;          /* clé principale */
+        width: 100%;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 28px rgba(12, 17, 23, 0.06);
+        overflow: hidden;
+      }
+      /* image en haut, contenu dessous et actions collées en bas */
+      .service-card img {
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+      }
+      .service-card h3 {
+        padding: 18px;
+        margin: 0;
+      }
+      .service-card ul {
+        flex-grow: 1;          /* remplit l’espace disponible */
+        padding: 8px 18px 0 32px;
+        margin: 0;
+        color: #444;
+      }
+      .service-card .card-actions {
+        margin-top: auto;
+        padding: 16px;
+      }
+      /* adaptivité mobile */
+      @media (max-width:980px){
+      .grid-2 { grid-template-columns: 1fr; }
+      }
+      .service-premium {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 0;
+        overflow: hidden;
+        border-radius: 20px;
+        background: linear-gradient(180deg, #ffffff, #f9fafb);
+        box-shadow: 0 20px 50px rgba(16, 24, 40, 0.12);
+        order: 99;
+        grid-column: 1 / -1;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+      }
+
+      .service-premium:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 30px 80px rgba(16, 24, 40, 0.18);
+      }
+
+      /* Media */
+      .service-premium .svc-media {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .service-premium .svc-hero {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1.05);
+        transition: transform 0.8s ease;
+      }
+
+      .service-premium:hover .svc-hero {
+        transform: scale(1.12);
+      }
+
+      /* Overlay élégant */
+      .service-premium .svc-media::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0.35),
+          rgba(0, 0, 0, 0.05)
+        );
+      }
+
+      /* Badge */
+      .service-premium .svc-badge {
+        position: absolute;
+        left: 18px;
+        top: 18px;
+        background: linear-gradient(90deg, #ffb400, #ff6b6b);
+        color: #111;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-weight: 800;
+        font-size: 0.8rem;
+        letter-spacing: 0.04em;
+        z-index: 2;
+        box-shadow: 0 8px 24px rgba(255, 107, 107, 0.35);
+      }
+
+      /* Contenu */
+      .service-premium .svc-content {
+        padding: 36px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .service-premium .svc-title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 16px;
+        color: #0f172a;
+        letter-spacing: -0.02em;
+      }
+
+      .service-premium .svc-features {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #475569;
+        margin-bottom: 28px;
+      }
+
+      /* Actions */
+      .service-premium .card-actions {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      /* ---------- Modal detail : scroll & taille ---------- */
+      .service-detail-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:99999; padding:20px; }
+      /* boîte principale: limite de hauteur et scroll interne */
+      .service-detail { background:#fff; width:100%; max-width:1100px; border-radius:14px; display:grid; grid-template-columns: 1fr 380px; gap:0; box-shadow:0 20px 60px rgba(2,6,23,0.3); max-height: calc(100vh - 48px); overflow: hidden; }
+      /* chaque colonne scrolle séparément si besoin */
+      .service-detail .detail-media, .service-detail .detail-body { padding:14px; overflow:auto; -webkit-overflow-scrolling: touch; }
+      /* galerie: taille cohérente */
+      .detail-gallery { width:100%; height:320px; border-radius:10px; overflow:hidden; }
+      .detail-gallery img { width:100%; height:100%; object-fit:cover; display:block; }
+      /* thumbs responsive */
+      .detail-thumbs { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+      .detail-thumbs img { width:72px; height:56px; object-fit:cover; border-radius:8px; cursor:pointer; border:2px solid transparent; }
+      .detail-thumbs img.active { border-color:#ffb400; }
+      /* empêcher scroll du body quand modal ouvert */
+      body.modal-open { overflow: hidden; }
+
+      .service-detail { grid-template-columns: 1fr; max-width: 95%; }
+      .detail-gallery{ height:220px; }
+      .service-premium { grid-column: 1 / -1; }
+
+      /* --- modal detail : scroll & comportement --- */
+      .service-detail {
+        /* déjà présent : width/max-width, border-radius, box-shadow */
+        max-height: calc(100vh - 48px); /* important : ne pas dépasser la fenêtre */
+        overflow: hidden;               /* le scroll se fera dans les colonnes */
+      }
+      /* chaque colonne doit pouvoir défiler indépendamment */
+      .service-detail .detail-media,
+      .service-detail .detail-body {
+        overflow: auto;
+        -webkit-overflow-scrolling: touch; /* scroll fluide sur iOS */
+        max-height: calc(100vh - 120px);   /* petite sécurité */
+        padding-right: 8px;
+      }
+      /* galerie : limite hauteur */
+      .detail-gallery { width:100%; height:320px; border-radius:10px; overflow:hidden; }
+      @media (max-width:980px){
+        .detail-gallery{ height:220px; }
+      }
+      @media (max-width: 900px) {
+      .service-premium {
+        grid-template-columns: 1fr;
+      }
+
+      .service-premium .svc-media {
+        min-height: 220px;
+      }
+
+      .service-premium .svc-content {
+        padding: 24px;
+      }
+
+      .service-premium .svc-title {
+        font-size: 1.6rem;
+      }
+    }
+    </style>
+
+    <script>
+      const PREMIUM_SERVICE = {
+        id: "svc_fab_peinture",
+        title: "CLÉ-EN-MAIN",
+        lead: "Solution globale EPC / Design & Build – Prise en charge intégrale du projet",
+        description: `
+        <div class="detail-section">
+
+          <h3>1. Cadre Contractuel & Technique</h3>
+          <h4>1.1 Type de contrat</h4>
+          <p><strong>Contrat :</strong> Clé-en-Main / EPC / Design & Build</p>
+          <p>Engagement sur :</p>
+          <ul>
+            <li>Coût global</li>
+            <li>Délais contractuels</li>
+            <li>Performances techniques</li>
+            <li>Conformité réglementaire</li>
+          </ul>
+        </div>
+
+        <div class="detail-section">
+          <h3>2. Phase Études Techniques</h3>
+
+          <h4>2.1 Études préliminaires</h4>
+          <ul>
+            <li>Analyse du programme client</li>
+            <li>Analyse du site (topographie, accès, environnement)</li>
+            <li>Étude de faisabilité technique et économique</li>
+            <li>Estimation budgétaire détaillée (DQE, BPU)</li>
+          </ul>
+
+          <h4>2.2 Études géotechniques</h4>
+          <ul>
+            <li>Reconnaissance des sols</li>
+            <li>Essais in situ (SPT, pénétromètre)</li>
+            <li>Dimensionnement des fondations</li>
+            <li>Recommandations techniques (profondeur, type de fondation)</li>
+          </ul>
+
+          <h4>2.3 Études architecturales</h4>
+          <p>APS / APD / EXE</p>
+          <ul>
+            <li>Plan de masse</li>
+            <li>Plans de niveaux</li>
+            <li>Coupes et façades</li>
+            <li>Détails constructifs</li>
+          </ul>
+
+          <h4>2.4 Études de structure</h4>
+          <ul>
+            <li>Calculs BA / acier / bois</li>
+            <li>Notes de calcul (charges permanentes, exploitation, sismiques, vent)</li>
+            <li>Dimensionnement des fondations</li>
+            <li>Poteaux, poutres, dalles</li>
+            <li>Voiles et murs porteurs</li>
+            <li>Plans de ferraillage</li>
+          </ul>
+
+          <h4>2.5 Études techniques (CVC – Électricité – Plomberie)</h4>
+          <ul>
+            <li>Dimensionnement des réseaux</li>
+            <li>Schémas unifilaires</li>
+            <li>Notes de calcul (débits, puissances, sections)</li>
+            <li>Choix des équipements</li>
+            <li>Études incendie et sécurité</li>
+          </ul>
+
+          <h4>2.6 Études BIM </h4>
+          <ul>
+            <li>Maquette numérique (LOD 300 à 400)</li>
+            <li>Détection des conflits (clash detection)</li>
+            <li>Quantitatifs automatiques</li>
+            <li>Coordination inter-lots</li>
+          </ul>
+        </div>
+
+        <div class="detail-section">
+          <h3>3. Phase Préparation de Chantier</h3>
+
+          <h4>3.1 Organisation</h4>
+          <ul>
+            <li>Plan d’installation de chantier (PIC)</li>
+            <li>Planning détaillé (PERT / GANTT)</li>
+            <li>Méthodologie d’exécution</li>
+            <li>Plan Qualité Chantier (PQC)</li>
+            <li>Plan Hygiène Sécurité Environnement (HSE)</li>
+          </ul>
+
+          <h4>3.2 Approvisionnement</h4>
+          <ul>
+            <li>Sélection fournisseurs</li>
+            <li>Fiches techniques matériaux</li>
+            <li>Échantillons validés</li>
+            <li>Logistique et stockage</li>
+          </ul>
+        </div>
+
+        <div class="detail-section">
+          <h3>4. Phase Travaux – Exécution Technique</h3>
+
+          <h4>4.1 Gros Œuvre</h4>
+          <ul>
+            <li>Terrassement</li>
+            <li>Décapage</li>
+            <li>Fouilles en pleine masse</li>
+            <li>Nivellement et compactage</li>
+            <li>Fondations (semelles, radier)</li>
+            <li>Élévation (voiles, poteaux, poutres)</li>
+            <li>Dalles pleines ou nervurées</li>
+            <li>Charpente béton, métallique ou bois</li>
+            <li>Traitement anticorrosion</li>
+          </ul>
+
+          <h4>4.2 Second Œuvre</h4>
+          <ul>
+            <li>Cloisons & enduits</li>
+            <li>Étanchéité toitures et terrasses</li>
+            <li>Traitement des points singuliers</li>
+          </ul>
+
+          <h4>4.3 Installations Techniques</h4>
+          <ul>
+            <li>Électricité (CFO / CFA)</li>
+            <li>Tableaux électriques</li>
+            <li>Mise à la terre</li>
+            <li>Tests et essais</li>
+            <li>Plomberie – Assainissement</li>
+            <li>Réseaux EF / EC</li>
+            <li>Évacuation EU / EP</li>
+            <li>Essais de pression</li>
+            <li>CVC – Installation & mise en service</li>
+          </ul>
+
+          <h4>4.4 Finitions</h4>
+          <ul>
+            <li>Revêtements sols et murs</li>
+            <li>Peinture technique et décorative</li>
+            <li>Menuiseries intérieures et extérieures</li>
+            <li>Faux plafonds</li>
+            <li>Équipements sanitaires</li>
+          </ul>
+        </div>
+
+        <div class="detail-section">
+          <h3>5. Contrôle Qualité & Suivi Technique</h3>
+          <ul>
+            <li>Contrôles internes</li>
+            <li>Essais béton (éprouvettes)</li>
+            <li>Vérification des plans EXE</li>
+            <li>Réunions de chantier</li>
+            <li>Rapports d’avancement</li>
+          </ul>
+        </div>
+
+        <div class="detail-section">
+          <h3>6. Réception Technique & Mise en Service</h3>
+
+          <h4>6.1 Essais et contrôles finaux</h4>
+          <ul>
+            <li>Essais réseaux</li>
+            <li>Vérifications conformité</li>
+            <li>Tests fonctionnels</li>
+          </ul>
+
+          <h4>6.2 Dossier des Ouvrages Exécutés (DOE)</h4>
+          <ul>
+            <li>Plans tel que construit</li>
+            <li>Notices techniques</li>
+            <li>Fiches produits</li>
+            <li>PV d’essais</li>
+          </ul>
+
+          <h4>6.3 Réception</h4>
+          <ul>
+            <li>Réception provisoire</li>
+            <li>Levée des réserves</li>
+            <li>Réception définitive</li>
+            <li>Remise des clés</li>
+          </ul>
+        </div>
+
+        <div class="detail-section">
+          <h3>7. Garanties Techniques</h3>
+          <ul>
+            <li>Garantie de parfait achèvement</li>
+            <li>Garantie biennale</li>
+            <li>Garantie décennale</li>
+            <li>Responsabilité civile professionnelle</li>
+          </ul>
+        </div>
+        `,
+        images: []
+      };
+      (function(){
+      
+        // === 🔹 Fonction pour fermer proprement tous les modals ===
+        function closeAllModals() {
+          document.querySelectorAll('.modal.active, .service-detail-backdrop')
+            .forEach(m => m.remove());
+          document.body.classList.remove('modal-open');
+        }
+      
+        // === 🔹 Ouvrir le détail d’un service ===
+        function openServiceDetail(svcData){
+          const tpl = document.getElementById('serviceDetailTpl');
+          if(!tpl){ alert('❌ Template modal introuvable.'); return; }
+      
+          const node = tpl.content.cloneNode(true);
+          const backdrop = node.querySelector('.service-detail-backdrop');
+          if(!backdrop){ alert('❌ Template mal formée (backdrop manquant).'); return; }
+      
+          // Éléments internes
+          const detailBox = backdrop.querySelector('.service-detail');
+            if (!svcData.images || svcData.images.length === 0) {
+              detailBox.classList.add("text-only");
+            }
+          const hero      = backdrop.querySelector('#detailHero');
+          const thumbs    = backdrop.querySelector('#detailThumbs');
+          const title     = backdrop.querySelector('#detailTitle');
+          const lead      = backdrop.querySelector('#detailLead');
+          const desc      = backdrop.querySelector('#detailDesc');
+          const closeBtn  = backdrop.querySelector('#detailClose');
+          const interestBtn = backdrop.querySelector('#detailInterestBtn');
+          const quoteBtn  = backdrop.querySelector('#detailQuoteBtn');
+      
+          // Remplissage
+          if (svcData.images && svcData.images.length > 0) {
+            if (hero) hero.src = svcData.images[0];
+          } else {
+            if (hero) hero.remove();
+          }
+          if (hero) hero.alt = svcData.title || 'Image';
+          if (title) title.textContent = svcData.title || '';
+          if (lead) lead.textContent = svcData.lead || '';
+          if (desc) desc.innerHTML = svcData.description || '';
+      
+          // Miniatures
+          if (thumbs) {
+            thumbs.innerHTML = (svcData.images || []).map((src,i) =>
+              `<img src="${src}" data-src="${src}" class="${i===0?'active':''}" alt="thumb-${i}">`
+            ).join('');
+          }
+      
+          // Ajout au DOM
+          document.body.appendChild(backdrop);
+          document.body.classList.add('modal-open');
+      
+          // Navigation entre images
+          if (thumbs) {
+            thumbs.querySelectorAll('img').forEach(img => {
+              img.addEventListener('click', () => {
+                thumbs.querySelectorAll('img').forEach(t=>t.classList.remove('active'));
+                img.classList.add('active');
+                if (hero) hero.src = img.dataset.src;
+              });
+            });
+          }
+      
+          // Fermeture du modal ===
+          function removeModal() {
+            if (backdrop && backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+            document.body.classList.remove('modal-open');
+          }
+      
+          closeBtn?.addEventListener('click', removeModal);
+          backdrop.addEventListener('click', e => { if (e.target === backdrop) removeModal(); });
+          document.addEventListener('keydown', e => { if (e.key === 'Escape') removeModal(); });
+      
+          // Bouton "Je suis intéressé" ===
+          interestBtn?.addEventListener('click', () => {
+            const svcName = svcData.title || svcData.id || 'Service';
+            removeModal();
+            const m = document.getElementById('interestModal');
+            if (m) {
+              const svcInput = document.getElementById('serviceInput');
+              const svcSpan  = document.getElementById('serviceName');
+              if (svcInput) svcInput.value = svcName;
+              if (svcSpan)  svcSpan.textContent = svcName;
+              m.classList.add('active');
+              document.body.classList.add('modal-open');
+            } else {
+              alert('❌ Modal d’intérêt introuvable.');
+            }
+          });
+      
+          // Bouton "Demander un devis" ===
+          quoteBtn?.addEventListener('click', () => {
+            window.location.href = window.location.origin + '/devis.html?service=' + encodeURIComponent(svcData.title || '');
+          });
+        }
+      
+        // Bouton "Voir détail" ===
+        document.addEventListener('click', function(e){
+          const btn = e.target.closest('.btn-detail');
+          if(!btn) return;
+          const sid = btn.dataset.serviceId || btn.closest('.service-card')?.dataset.serviceId;
+      
+          if(sid === PREMIUM_SERVICE.id){
+            openServiceDetail(PREMIUM_SERVICE);
+          } else {
+            const all = JSON.parse(localStorage.getItem('btp_services') || '[]');
+            const svc = all.find(s => s.id === sid);
+            if (svc) {
+              openServiceDetail({
+                id: svc.id,
+                title: svc.title || '',
+                lead: svc.short || '',
+                description: svc.description || '',
+                images: svc.image ? [svc.image] : (svc.images || [])
+              });
+            } else {
+              const card = btn.closest('.service-card');
+              const titleText = card ? (card.querySelector('h3')?.textContent || '') : '';
+              openServiceDetail({ id: sid || 'unknown', title: titleText, lead: '', description: '', images: [] });
+            }
+          }
+        });
+      
+        // Bouton "Je suis intéressé" (en dehors du détail) ===
+        document.addEventListener('click', function(e){
+          const btn = e.target.closest('.btn-interested');
+          if(!btn) return;
+          const svc = btn.dataset.service ||
+            btn.closest('.service-card')?.querySelector('h3')?.textContent ||
+            'Service';
+          const m = document.getElementById('interestModal');
+          if (m) {
+            const svcInput = document.getElementById('serviceInput');
+            const svcSpan = document.getElementById('serviceName');
+            if (svcInput) svcInput.value = svc;
+            if (svcSpan) svcSpan.textContent = svc;
+            m.classList.add('active');
+            document.body.classList.add('modal-open');
+          }
+        });
+      
+        // Fermer proprement tous les modals (croix ou annuler) ===
+        document.addEventListener('click', function(e){
+          if (e.target.closest('.modal-close, .btn-cancel, .close-btn, .modal-overlay')) {
+            closeAllModals();
+          }
+        });
+      })();
+    </script>
+    <!-- ========================= PORTFOLIO ========================= -->
+    <section class="animate-section container portfolio-section">
+      <h2 class="section-title">Nos projets</h2>
+      <p class="section-sub">Découvrez nos dernières réalisations, reflet de notre savoir-faire, de notre précision et de notre engagement envers l’excellence.</p>
+
+      <div class="portfolio-grid">
+        <div class="portfolio-card">
+          <div class="card-image">
+            <img src="images/renovation.jpg" alt="Maison familiale moderne — 2025" />
+          </div>
+          <div class="card-info">
+            <p class="muted">Maison familiale — 2019</p>
+          </div>
+        </div>
+
+        <div class="portfolio-card">
+          <div class="card-image">
+            <img src="images/maisonfamiliale.jpg" alt="Maison familiale — 2025" />
+          </div>
+          <div class="card-info">
+            <p class="muted">Maison familiale — 2025</p>
+          </div>
+        </div>
+
+        <div class="portfolio-card">
+          <div class="card-image">
+            <img src="images/commercial.jpg" alt="Maison familiale — 2025" />
+          </div>
+          <div class="card-info">
+            <p class="muted">Maison familiale moderne — 2025</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ========================= WHY CHOOSE ========================= -->
+    <section class="animate-section container why-choose">
+      <h2 class="section-title gradient-texte" >Pourquoi nous choisir</h2>
+
+      <div class="grid-3 stats">
+        <div class="stat card reveal">
+          <div class="value-lineansetpoucentage">
+            <strong class="counter gradient-text" data-target="15" >0</strong>
+            <span class="ansetpoucentage gradient-text">ans</span>
+          </div>
+          <p class="muted">d'expérience</p>
+        </div>
+        <div class="stat card reveal">
+          <div class="value-line">
+            <span class="plus gradient-text">Plus de</span>
+            <strong class="counter gradient-text" data-target="150">0</strong>
+          </div>
+          <p class="muted">projets complétés</p>
+        </div>        
+        <div class="stat card reveal">
+          <div class="value-lineansetpoucentage">
+            <strong class="counter gradient-text" data-target="98">0</strong>
+            <span class="ansetpoucentage gradient-text">%</span>
+          </div>
+          <p class="muted">satisfaction client</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= STYLES ========================= -->
+    <style>
+      /* === Animation fade-in au scroll === */
+      .animate-section {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+      }
+      .animate-section.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .gradient-text {
+          background: linear-gradient(90deg, #ffb400, #ff6b6b);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          display: inline-block;
+      }
+      /* === Grid layout === */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+      }
+      /* === Card style & hover effect === */
+      .service-card {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.5s ease, box-shadow 0.5s ease;
+      }
+      .service-card:hover {
+        transform: translateY(-10px) scale(1.03) rotateX(2deg);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      }
+      /* === Card image hover === */
+      .service-card img {
+        width: 100%;
+        border-radius: 8px;
+        transition: transform 0.5s ease;
+      }
+      .service-card:hover img {
+        transform: scale(1.05) rotate(1deg);
+      }
+      /* === Buttons animation === */
+      .card-actions .btn-small,
+      .card-actions .btn-interested {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .card-actions .btn-small:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      .card-actions .btn-interested:hover {
+        background: linear-gradient(45deg,#ff6b6b,#f06595);
+        color: #fff;
+        transform: scale(1.05);
+      }
+      /* === Portfolio Section === */
+      .portfolio-section {
+        position: relative;
+        background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+        z-index: 1;
+      }
+      .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+      }
+      .portfolio-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transform: translateY(30px);
+        opacity: 0;
+        transition: all 0.5s ease;
+        cursor: pointer;
+      }
+      .portfolio-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .portfolio-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      }
+      .card-image img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        transition: transform 1s ease, filter 1s ease;
+      }
+      .portfolio-card:hover .card-image img {
+        transform: scale(1.15);
+        filter: brightness(1.1) contrast(1.05);
+      }
+      .card-info {
+        text-align: center;
+        padding: 15px;
+      }
+      .card-info p {
+        color: #555;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+      /* === Why choose section === */
+      .why-choose {
+        background: linear-gradient(135deg, #f9fafb, #eef1f7);
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        text-align: center;
+        overflow: hidden;
+      }
+      .why-choose .section-title {
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, #ffb400);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+      }
+      .stat.card {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        transition: all 0.4s ease;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transform: translateY(40px);
+        opacity: 0;
+      }
+      .stat.card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 12px 30px rgba(0,102,255,0.2);
+      }
+      .stat strong {
+        font-size: 2.4rem;
+        color: #ffb400;
+        font-weight: 800;
+        display: inline-block;
+      }
+      .stat p {
+        margin-top: 8px;
+        font-size: 1rem;
+      }
+      /* Reveal animation */
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+        transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+      }
+      .stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .counter {
+        font-size: 40px;
+        font-weight: 800;
+      }
+      .value-line {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* centre l'ensemble (+ et 150) */
+        gap: 6px; /* espace entre + et 150 */
+      }
+      .plus {
+        font-size: 26px; /* taille légèrement plus petite */
+        font-weight: 700;
+        line-height: 1;
+        display: inline-block;
+      }
+      .value-lineansetpoucentage {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        flex-direction: row; /* Inverse l’ordre → + à droite */
+      }
+      .ansetpoucentage{
+        font-size: 26px; 
+        font-weight: 700;
+        line-height: 1;
+        display: inline-block;
+      }
+      .detail-body {
+        font-family: "Poppins", sans-serif;
+      }
+
+      .detail-section {
+        margin-bottom: 26px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .detail-section h3 {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+        color: #111;
+      }
+
+      .detail-section h4 {
+        font-size: 1rem;
+        margin: 10px 0 6px;
+        color: #444;
+      }
+
+      .detail-section ul {
+        padding-left: 20px;
+        margin: 6px 0 12px;
+      }
+
+      .detail-section li {
+        margin-bottom: 6px;
+        color: #333;
+      }
+
+      .detail-section .note {
+        background: #f8fafc;
+        border-left: 4px solid #ffb400;
+        padding: 10px 14px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+      }
+      .detail-rich {
+        font-family: "Poppins", sans-serif;
+        line-height: 1.6;
+      }
+
+      .detail-section {
+        margin-bottom: 26px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .detail-section h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .detail-section h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 12px 0 6px;
+        color: #444;
+      }
+
+      .detail-section ul {
+        padding-left: 20px;
+        margin: 6px 0 14px;
+      }
+
+      .detail-section li {
+        margin-bottom: 6px;
+      }
+
+      .detail-section .note {
+        background: #f8fafc;
+        border-left: 4px solid #ffb400;
+        padding: 12px 14px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+      }
+      /* Mode texte uniquement */
+      .service-detail.text-only {
+        grid-template-columns: 1fr !important;
+      }
+
+      .service-detail.text-only .detail-media {
+        display: none !important;
+      }
+
+      .service-detail.text-only .detail-body {
+        max-width: 100%;
+        padding: 26px;
+      }
+
+      /* Mise en forme premium du texte */
+      .detail-section {
+        margin-bottom: 26px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .detail-section h3 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #111;
+      }
+
+      .detail-section h4 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin: 14px 0 8px;
+        color: #444;
+      }
+
+      .detail-section p {
+        margin: 6px 0 10px;
+        color: #333;
+        line-height: 1.7;
+      }
+
+      .detail-section ul {
+        padding-left: 20px;
+        margin: 6px 0 14px;
+      }
+
+      .detail-section li {
+        margin-bottom: 6px;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .detail-title {
+        font-size: 1.7rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+
+      .detail-lead {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 18px;
+      }
+    </style>
+    <!-- ========================= SCRIPTS ========================= -->
+    <script>
+      // === Animation au scroll pour sections animées ===
+      const animatedSections = document.querySelectorAll('.animate-section');
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting){
+            entry.target.classList.add('visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      animatedSections.forEach(section => observer.observe(section));
+
+      // === Animation progressive des cartes portfolio ===
+      const portfolioCards = document.querySelectorAll('.portfolio-card');
+      function showPortfolio() {
+        const windowHeight = window.innerHeight;
+        portfolioCards.forEach(card => {
+          const top = card.getBoundingClientRect().top;
+          if (top < windowHeight - 100) {
+            card.classList.add('visible');
+          }
+        });
+      }
+      window.addEventListener('scroll', showPortfolio);
+      showPortfolio();
+
+      // === Animation reveal pour stats et why-choose ===
+      const reveals = document.querySelectorAll('.reveal');
+      function revealOnScroll() {
+        const windowHeight = window.innerHeight;
+        reveals.forEach(el => {
+          const top = el.getBoundingClientRect().top;
+          if (top < windowHeight - 100) {
+            el.classList.add('visible');
+          }
+        });
+      }
+      window.addEventListener('scroll', revealOnScroll);
+      revealOnScroll();
+
+      // === Compteur animé ===
+      const counters = document.querySelectorAll('.counter');
+      counters.forEach(counter => {
+        const target = +counter.getAttribute('data-target');
+        const increment = target / 80; // vitesse d'animation
+
+        const update = () => {
+          const value = +counter.innerText;
+          if (value < target) {
+            counter.innerText = Math.ceil(value + increment);
+            requestAnimationFrame(update);
+          } else {
+            counter.innerText = target;
+          }
+        };
+        update();
+      });
+    </script>
+    <!-- === INTEREST MODAL === -->
+    <div id="interestModal" class="modal">
+      <div class="modal-overlay"></div>
+      <div class="modal-panel">
+        <button class="modal-close" id="closeModal">&times;</button>
+        <h3>Intéressé par <span id="serviceName">—</span></h3>
+
+        <form id="interestForm" class="modern-form">
+          <input type="hidden" id="serviceInput" name="service">
+
+          <div class="form-group">
+            <label>Nom complet</label>
+            <input name="fullname"  required>
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input name="email" type="email"  required>
+          </div>
+
+          <div class="form-group">
+            <label>Téléphone</label>
+            <input name="phone"  required>
+          </div>
+
+          <div class="form-group">
+            <label>Message</label>
+            <textarea name="message" ></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" class="btn-envoyer">Envoyer</button>
+            <button type="button" class="btn-ghost" id="cancelModal">Annuler</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <style>
+      /* === MODAL OVERLAY === */
+      .modal {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100vh;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px);
+        z-index: 999;
+      }
+      .modal.active {
+        display: flex;
+        animation: fadeIn 0.4s ease;
+      }
+      .modal-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        border-radius: 0;
+      }
+      /* === MODAL PANEL === */
+      .modal-panel {
+        position: relative;
+        background: #fff;
+        padding: 40px 50px;
+        border-radius: 18px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+        width: 100%;
+        max-width: 550px;
+        z-index: 10;
+        animation: slideUp 0.5s ease;
+
+        /* ✅ Ajouts pour le scroll */
+        max-height: 85vh;           /* limite la hauteur du modal */
+        overflow-y: auto;           /* active le défilement vertical */
+        scrollbar-width: thin;      /* (Firefox) rend la barre fine */
+        scrollbar-color: #ffb400 #f5f5f5;
+      }
+      .modal-panel::-webkit-scrollbar {
+        width: 8px;
+      }
+      .modal-panel::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #ffb400, #ff6b6b);
+        border-radius: 10px;
+      }
+      .modal-panel::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+      }
+      /* Fermer le modal */
+      .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 18px;
+        background: none;
+        border: none;
+        font-size: 28px;
+        font-weight: bold;
+        color: #ff6b6b;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .modal-close:hover {
+        color: #ffb400;
+        transform: scale(1.2);
+      }
+      /* === TITRE === */
+      .modal-panel h3 {
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 1.8rem;
+        background: linear-gradient(90deg, #ffb400, #ff6b6b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: 0.5px;
+      }
+      /* === FORMULAIRE === */
+      .modern-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 6px;
+      }
+      input, textarea {
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 12px 15px;
+        background: #fafafa;
+        transition: 0.3s;
+        font-size: 15px;
+      }
+      input:focus, textarea:focus {
+        border-color: #ffb400;
+        box-shadow: 0 0 0 3px rgba(255,180,0,0.15);
+        background-color: #fff;
+        outline: none;
+      }
+      /* === BOUTONS === */
+      .modal-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 10px;
+      }
+      .btn-primary {
+        background: linear-gradient(90deg, #ffb400, #ff6b6b);
+        color: #fff;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(255,107,107,0.3);
+      }
+      .btn-ghost {
+        border: 2px solid #ff6b6b;
+        color: #ff6b6b;
+        padding: 12px 30px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.3s;
+      }
+      .btn-ghost:hover {
+        background: #ff6b6b;
+        color: white;
+      }
+      /* === ANIMATIONS === */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes slideUp {
+        from { transform: translateY(40px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+    </style>
+    
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-about">
+        <div class="footer-brand">
+          <h4>COR'BAT</h4>
+          <span class="company-badge">Entreprise</span>
+        </div>
+        <p class="lux-separator">Construction <span class="star">★</span> Rénovation <span class="star">★</span> Design</p>
+        <p>
+          <svg xmlns="http://www.w3.org/2000/svg"
+          width="24" height="24"
+          viewBox="0 0 64 64"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+        <!-- Cercle -->
+        <circle cx="32" cy="32" r="30"
+                stroke="#E0E0E0"
+                stroke-width="2"/>
+        <!-- Téléphone -->
+        <path d="M22 10
+                h12
+                a4 4 0 0 1 4 4
+                v36
+                a4 4 0 0 1 -4 4
+                h-12
+                a4 4 0 0 1 -4 -4
+                v-36
+                a4 4 0 0 1 4 -4
+                z"
+              stroke="#0A66C2"
+              stroke-width="2.5"/>
+        <circle cx="28" cy="48" r="1.5" fill="#0A66C2"/>
+        <!-- Ondes WiFi à droite -->
+        <path d="M42 26
+                a6 6 0 0 1 0 12"
+              stroke="#2ECC71"
+              stroke-width="2"/>
+        <path d="M46 23
+                a9 9 0 0 1 0 18"
+              stroke="#2ECC71"
+              stroke-width="2"/>
+        <path d="M50 20
+                a12 12 0 0 1 0 24"
+              stroke="#2ECC71"
+              stroke-width="2"/>
+        </svg>
+          Tél : 
+          <a href="tel:+261338790262">+261 33 87 902 62</a> •
+          <a href="tel:+261376341770">+261 37 63 417 70</a> •
+          <a href="tel:+261380881659">+261 38 08 816 59</a>
+        </p>      
+        <p>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="30" stroke="#E0E0E0" stroke-width="2"/>
+            <rect x="16" y="22" width="32" height="20" rx="3" stroke="#EA4335" stroke-width="2.5"/>
+            <path d="M16 24 L32 36 L48 24" stroke="#EA4335" stroke-width="2.5"/>
+          </svg>          
+          Email : <a href="mailto:corbatmadagascar@gmail.com">corbatmadagascar@gmail.com</a></p>
+      </div>
+      
+  
+      <div class="footer-social">
+        <h4>Suivez-nous</h4>
+        <div class="social-links">
+          <a href="https://www.facebook.com/profile.php?id=61584050241087" target="_blank" aria-label="Facebook" class="social facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://wa.me/261338790262" target="_blank" aria-label="WhatsApp" class="social whatsapp"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://www.instagram.com/corbat_construction" target="_blank" aria-label="Instagram" class="social instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/in/corbat-construction-82079939b" target="_blank" aria-label="LinkedIn" class="social linkedin"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+    </div>
+  
+    <div class="footer-bottom">
+      <p>© 2025 COR'BAT. Tous droits réservés.</p>
+      <p class="dev-credit">
+        Développé par <a href="https://wa.me/261331916764" target="_blank">Kenny R.</a> — <span class="role">Développeur Web</span>
+      </p>
+    </div>
+  </footer>
+  
+  <style>
+    /* === Footer moderne === */
+    .site-footer {
+      background: #000000;
+      color: #fff;
+      padding: 50px 40px 20px 40px;
+      font-family: 'Poppins', sans-serif;
+      border-top-left-radius: 25px;
+      border-top-right-radius: 25px;
+      box-shadow: 0 -5px 25px rgba(0,0,0,0.1);
+    }
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 40px;
+    }
+    .footer-about h4, .footer-social h4 {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    .footer-about p, .footer-about a {
+      font-size: 1rem;
+      color: #f0f0f0;
+      text-decoration: none;
+      margin-bottom: 6px;
+      transition: color 0.3s ease;
+    }
+    .footer-about a:hover {
+      color: #FFD700;
+    }
+    .footer-social h4 {
+      margin-left: 90px;
+    }
+    .footer-social .social-links {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+      margin-left: 40%;
+    }
+    .footer-social .social {
+      font-size: 1.8rem;
+      color: #fff;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .footer-social .social:hover {
+      transform: translateY(-5px) scale(1.1);
+    }
+    .footer-social .facebook:hover { color: #1877f2; }
+    .footer-social .whatsapp:hover { color: #25D366; }
+    .footer-social .instagram:hover { color: #E4405F; }
+    .footer-social .linkedin:hover { color: #0a66c2; }
+    .footer-bottom {
+      text-align: center;
+      margin-top: 35px;
+      font-size: 0.95rem;
+      color: #ccc;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 15px;
+    }
+    .footer-bottom {
+      text-align: center;
+      padding: 12px 0;
+      font-size: 14px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .footer-bottom .dev-credit {
+      margin-top: 4px;
+      font-size: 11.5px; /* petit et fin */
+      opacity: 0.45; /* discret */
+      transition: opacity 0.3s;
+    }
+    .footer-bottom .dev-credit:hover {
+      opacity: 0.8; /* plus visible quand on passe la souris */
+    }
+    .footer-bottom .dev-credit a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .footer-bottom .dev-credit a:hover {
+      text-decoration: underline;
+    }
+    .footer-bottom .dev-credit .role {
+      font-style: italic;
+      opacity: 0.7;
+    }
+    .lux-separator {
+      font-size: 19px;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+      color: #2a2a2a;
+      font-family: "Georgia", serif;
+    }
+    .lux-separator .star {
+      padding: 0 10px;
+      font-size: 22px;
+      color: #d4af37;      /* or royal */
+      text-shadow: 0 0 4px rgba(212, 175, 55, 0.6);
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .company-badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #111, #333);
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+  </style>
+  
+  <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Clients intéressés — COR'BAT</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    /* Styles locaux pour la page leads */
+    .container { max-width:1100px; margin:28px auto; font-family:'Poppins',sans-serif; }
+    h1 { margin-bottom:16px; font-size:1.6rem; }
+    .card { background:#fff; padding:16px; border-radius:10px; box-shadow:0 6px 20px rgba(2,6,23,0.06); }
+    .controls { display:flex; gap:10px; align-items:center; margin-bottom:12px; }
+    input#search { padding:10px; border-radius:8px; border:1px solid #e6e6e6; width:100%; max-width:420px; }
+    select#filterStatus { padding:9px; border-radius:8px; border:1px solid #e6e6e6; }
+    .btn-small { padding:8px 10px; border-radius:8px; background:#111; color:#fff; border:0; cursor:pointer; }
+    table.table { width:100%; border-collapse:collapse; margin-top:12px; font-size:0.95rem; }
+    table.table thead th { text-align:left; padding:10px; border-bottom:1px solid #f0f0f0; background:#fafafa; }
+    table.table tbody td { padding:10px; border-bottom:1px solid #f8f8f8; vertical-align:middle; }
+    .status-select { padding:6px 8px; border-radius:6px; border:1px solid #ddd; }
+    .action-buttons button { margin-right:6px; }
+    .muted { color:#777; font-size:0.9rem; }
+    /* Modal details */
+    .modal {
+      position: fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background: rgba(0,0,0,0.5); z-index:9999; padding:20px;
+    }
+    .modal.active { display:flex; }
+    .modal-panel {
+      width:100%; max-width:720px; background:#fff; padding:22px; border-radius:12px; box-shadow:0 12px 40px rgba(0,0,0,0.25);
+    }
+    .modal-panel h3 { margin:0 0 8px 0; }
+    .modal-row { display:flex; gap:12px; margin-bottom:8px; }
+    .modal-row b { width:140px; color:#333; }
+    .modal-close { float:right; background:transparent;border:0;font-size:20px;cursor:pointer;color:#666; }
+    @media (max-width:700px){
+      .modal-row { flex-direction:column; }
+      .modal-row b { width:auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">
+        <img src="../images/COR'BAT.png" alt="COR'BAT">
+      </span>
+      <span class="brand-name">Admin COR'BAT</span>
+    </div>
+    <!-- ======== NAVIGATION ======== -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+      <a href="devis.html" class="nav-link">Liste devis</a>
+      <a href="leads.html" class="nav-link">Clients intéressés</a>
+      <a href="projects.html" class="nav-link">Projets récents</a>
+      <a href="services.html" class="nav-link">Nos services</a>
+      <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+      <div class="admin-actions">
+        <button id="btnLogout" class="btn-logout">Se déconnecter</button>
+      </div>
+    </nav>
+  </header>
+  <!-- ======== STYLES (consolidés) ======== -->
+  <style>
+    /* === Header moderne === */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 40px;
+      background: linear-gradient(90deg,#000 0%, #000 100%);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+    /* Brand (logo + texte) */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .brand .logo img {
+      width: 48px;
+      height: auto;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .brand .brand-name {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      background: #ffffff;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .actions button {
+      border:0;
+      border-radius:8px;
+      padding:6px 8px;
+      cursor:pointer;
+      font-weight:700;
+      margin-right:6px;
+    }
+    .actions .danger {
+      background:red;
+      color:#ffffff;
+    }
+    .brand img { width:50px; height:auto; }
+    /* Nav alignée à droite */
+    .nav {
+      display: flex;
+      gap: 28px;
+      margin-left: auto; /* pousse le menu vers la droite */
+      align-items: center;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+      font-size: 1rem;
+      transition: color 0.25s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -6px;
+      left: 0;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      transition: width 0.25s ease;
+    }
+    .nav-link:hover {
+      color: #ffb400;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    /* Bouton Demander un devis */
+    .btn-devis {
+      padding: 8px 16px;
+      border-radius: 22px;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      color: #111;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(255,107,107,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-devis:hover {
+      transform: translateY(-2px);
+    }
+    /* Menu toggle (mobile) */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      margin-left: 12px;
+    }
+    .menu-toggle span {
+      width: 26px;
+      height: 3px;
+      background: #fff;
+      border-radius: 3px;
+    }
+    /* === Responsive === */
+    @media (max-width: 1024px) {
+      .nav {
+        display: none;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        background: #000;
+        flex-direction: column;
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        gap: 12px;
+        min-width: 200px;
+      }
+      .nav.active { display: flex; }
+      .menu-toggle { display: flex; }
+      .brand .brand-name { font-size: 1.1rem; }
+    }
+  </style>
+
+  <main class="container section">
+    <h1>Liste des clients intéressés</h1>
+  
+    <div class="card" role="region" aria-label="Gestion des leads">
+      <div class="controls" style="justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;gap:8px;flex:1;min-width:260px;align-items:center">
+          <input id="search" placeholder="Rechercher nom / email / service..." aria-label="Recherche leads">
+          <!-- NOTE: value = cle technique (new/contacted/quoted/closed) -->
+          <select id="filterStatus" aria-label="Filtrer par statut">
+            <option value="">Tous statuts</option>
+            <option value="Nouvelle">Nouvelle</option>
+            <option value="Contactée">Contactée</option>
+            <option value="Résolue">Résolue</option>
+          </select>
+        </div>
+  
+        <div style="display:flex;gap:8px;align-items:center">
+        </div>
+      </div>
+  
+      <table id="leadsTable" class="table" aria-live="polite">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rempli par ../js/admin.js (clé attendue : 'btp_leads') -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+  <!-- Modal pour voir les détails -->
+  <div id="leadModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="leadModalTitle">
+    <div class="modal-panel" role="document">
+      <button class="modal-close" id="closeLeadModal" aria-label="Fermer">&times;</button>
+      <h3 id="leadModalTitle">Détails du client intéressé</h3>
+      <div id="leadDetails" style="margin-top:12px"></div>
+      <div style="margin-top:16px;text-align:right">
+        <button id="closeLeadModal2" class="btn-small">Fermer</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    (async function(){
+      const API_URL = "/api/leads";
+      const tableBody = document.querySelector("#leadsTable tbody");
+      const searchInput = document.getElementById("search");
+      const filterStatus = document.getElementById("filterStatus");
+      const exportBtn = document.getElementById("exportCsv");
+    
+      const safe = v => v || "-";
+      const fmt = d => d ? new Date(d).toLocaleString("fr-FR") : "-";
+    
+      async function fetchLeads() {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error("❌Erreur serveur");
+        return await res.json();
+      }
+    
+      async function updateStatus(id, newStatus) {
+        try {
+          const res = await fetch(`${API_URL}/${id}/status`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: newStatus })
+          });
+          if (!res.ok) throw new Error("❌Erreur serveur");
+          return true;
+        } catch (e) {
+          alert("❌ Erreur lors de la mise à jour du statut : " + e.message);
+          return false;
+        }
+      }
+    
+      async function render() {
+        let leads = await fetchLeads();
+    
+        const search = searchInput.value.toLowerCase();
+        const filter = filterStatus.value.toLowerCase();
+    
+        if (filter)
+          leads = leads.filter(l => (l.status || "").toLowerCase() === filter);
+        if (search)
+          leads = leads.filter(l =>
+            ((l.fullname||"") + (l.email||"") + (l.service||"")).toLowerCase().includes(search)
+          );
+    
+        if (!leads.length) {
+          tableBody.innerHTML = `<tr><td colspan="7" style="padding:20px;text-align:center;color:#777;">Aucun client trouvé.</td></tr>`;
+          return;
+        }
+    
+        tableBody.innerHTML = leads.map(l => `
+          <tr>
+            <td>${safe(l.fullname)}</td>
+            <td>${safe(l.email)}</td>
+            <td>${safe(l.phone)}</td>
+            <td>${safe(l.service)}</td>
+            <td>${fmt(l.created_at)}</td>
+            <td>
+              <select class="status-select" data-id="${l.id}">
+                <option value="Nouvelle" ${l.status==="Nouvelle"?"selected":""}>Nouvelle</option>
+                <option value="Contactée" ${l.status==="Contactée"?"selected":""}>Contactée</option>
+                <option value="Résolue" ${l.status==="Résolue"?"selected":""}>Résolue</option>
+              </select>
+            </td>
+            <td><button class="btn-small view-btn" data-id="${l.id}">Voir</button></td>
+            <td class="actions"><button class="danger" data-id="${l.id}">Supprimer</button></td>
+          </tr>
+        `).join("");
+
+        // === 🗑️ Bouton Supprimer ===
+        tableBody.querySelectorAll(".danger").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            const id = e.currentTarget.dataset.id;
+            if (!confirm("Voulez-vous vraiment supprimer ce client ?")) return;
+            try {
+              const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+              if (!res.ok) throw new Error("❌Erreur suppression");
+              alert("✅ Client supprimé avec succès !");
+              await render();
+            } catch (err) {
+              console.error("❌Erreur suppression client:", err);
+              alert("❌ Erreur lors de la suppression du client.");
+            }
+          });
+        });
+    
+        // Voir détails
+        document.querySelectorAll(".view-btn").forEach(btn=>{
+          btn.onclick = ()=>{
+            const lead = leads.find(x=>x.id===btn.dataset.id);
+            if(!lead) return alert("❌Client introuvable");
+            showLeadModal(lead);
+          };
+        });
+    
+        // Mise à jour du statut
+        document.querySelectorAll(".status-select").forEach(sel=>{
+          sel.onchange = async ()=>{
+            const id = sel.dataset.id;
+            const ok = await updateStatus(id, sel.value);
+            if(ok) render();
+          };
+        });
+      }
+    
+      // Modal
+      function showLeadModal(lead){
+        const modal = document.getElementById("leadModal");
+        const target = document.getElementById("leadDetails");
+        target.innerHTML = `
+          <div class="modal-row"><b>Nom :</b><div>${safe(lead.fullname)}</div></div>
+          <div class="modal-row"><b>Email :</b><div>${safe(lead.email)}</div></div>
+          <div class="modal-row"><b>Téléphone :</b><div>${safe(lead.phone)}</div></div>
+          <div class="modal-row"><b>Service :</b><div>${safe(lead.service)}</div></div>
+          <div class="modal-row"><b>Statut :</b><div>${safe(lead.status)}</div></div>
+          <div class="modal-row"><b>Date :</b><div>${fmt(lead.created_at)}</div></div>
+          <div style="margin-top:10px"><b>Message :</b><div style="white-space:pre-wrap;margin-top:6px">${safe(lead.message)}</div></div>
+        `;
+        modal.classList.add("active");
+      }
+    
+      document.getElementById("closeLeadModal").onclick = ()=>document.getElementById("leadModal").classList.remove("active");
+      document.getElementById("closeLeadModal2").onclick = ()=>document.getElementById("leadModal").classList.remove("active");
+      document.getElementById("leadModal").onclick = e=>{
+        if(e.target.id==="leadModal") e.target.classList.remove("active");
+      };
+    
+      searchInput.oninput = render;
+      filterStatus.onchange = render;
+      render();
+    
+    })();
+  </script>
+    <!-- ========== Admin Footer ========== -->
+    <footer class="admin-footer" role="contentinfo" aria-label="Pied de page administration">
+      <div class="admin-footer-inner">
+        <div class="admin-left">
+          <div class="admin-brand">
+            <img src="../images/COR'BAT.png" alt="COR'BAT" />
+            <div>
+              <strong>Admin COR'BAT</strong>
+              <div class="small muted">Espace administrateur</div>
+            </div>
+          </div>
+    
+          <div class="admin-contact dev-credit">
+            <div>Développé par : <strong>Kenny R.</strong></div>
+            <div>Tél : <a href="tel:+261331916764">+261 33 19 167 64</a></div>
+            <div>Email : <a href="mailto:ramarielina2604@gmail.com">ramarielina2604@gmail.com</a></div>
+          </div>      
+        </div>
+    
+        <div class="admin-right">
+          <nav class="admin-links" aria-label="Liens utilitaires admin">
+            <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+            <a href="devis.html" class="nav-link">Devis</a>
+            <a href="leads.html" class="nav-link">Clients</a>
+            <a href="projects.html" class="nav-link">Projets</a>
+            <a href="services.html" class="nav-link">Services</a>
+            <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+          </nav>
+        </div>
+      </div>
+    
+      <div class="admin-footer-bottom">
+        <small>© <span id="adminYear"></span> COR'BAT — Espace Admin • Tous droits réservés.</small>
+      </div>
+    </footer>
+    <!-- ====== Styles pour admin-footer ====== -->
+    <style>
+      .admin-footer {
+        background:#070707;
+        color:#e6e6e6;
+        padding:18px 24px;
+        border-top:1px solid rgba(255,255,255,0.04);
+        font-family: 'Poppins', sans-serif;
+        margin-top:32px;
+      }
+      .admin-footer-inner {
+        display:flex;
+        gap:20px;
+        align-items:center;
+        justify-content:space-between;
+        flex-wrap:wrap;
+      }
+      .admin-left { display:flex; gap:14px; align-items:center; min-width:200px; }
+      .admin-brand img { width:44px; height:44px; object-fit:contain; border-radius:8px; }
+      .admin-brand strong { display:block; color:#fff; }
+      .small { font-size:0.87rem; }
+      .muted { color:#a9a9a9; }
+      .admin-center { flex:1; display:flex; justify-content:center; }
+      .kpis { display:flex; gap:22px; align-items:center; }
+      .kpi { text-align:center; min-width:88px; }
+      .kpi-value { font-weight:700; font-size:1.25rem; color:linear-gradient(90deg,#ffb400,#ff6b6b); }
+      .kpi-label { font-size:0.85rem; color:#bdbdbd; }
+      .admin-right { display:flex; gap:14px; align-items:center; min-width:220px; justify-content:flex-end; }
+      .admin-links { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+      .admin-links a { color:#dfe6ef; text-decoration:none; font-size:0.95rem; padding:6px 8px; border-radius:6px; }
+      .admin-links a:hover { background:rgba(255,255,255,0.02); color:#fff; }
+      .admin-actions { display:flex; gap:8px; align-items:center; }
+      .btn-ghost.small { padding:6px 10px; background:transparent; color:#ccc; border:1px solid rgba(255,255,255,0.03); border-radius:8px; cursor:pointer; }
+      .btn-logout { background:#ef4444; color:#ffffff; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
+      .admin-footer-bottom { text-align:center; margin-top:12px; color:#9a9a9a; font-size:0.88rem; border-top:1px solid rgba(255,255,255,0.02); padding-top:10px; }
+      .dev-credit {
+        position: fixed;
+        bottom: 10px;
+        right: 14px;
+        font-size: 0.68rem;
+        opacity: 0.25;
+        color: #ffffff; /* si fond clair → change en #555 */
+        line-height: 1.25;
+        text-align: right;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        z-index: 9999;
+      }
+      .dev-credit a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .dev-credit:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+      }
+      /* Responsive */
+      @media (max-width:880px){
+        .admin-footer-inner { flex-direction:column; align-items:stretch; gap:12px; }
+        .admin-center { order:3; justify-content:space-between; }
+        .admin-right { justify-content:space-between; }
+      }
+    </style>
+
+    <script>
+      (function(){
+        // Mise à jour de l'année footer
+        document.getElementById('adminYear').textContent = new Date().getFullYear();
+      
+        // Déconnexion via backend (efface cookie)
+        const btnLogout = document.getElementById('btnLogout');
+        if (btnLogout) {
+          btnLogout.addEventListener('click', async function(){
+            if(!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
+      
+            await fetch("/api/auth/logout", {
+              method: "POST",
+              credentials: "include"
+            });
+      
+            // Nettoyage des ancien restes locaux (optionnel mais propre)
+            localStorage.removeItem('btp_admin_logged');
+            localStorage.removeItem('btp_admin_token');
+            sessionStorage.removeItem('btp_admin_logged');
+            sessionStorage.removeItem('btp_admin_token');
+      
+            window.location.href = "login.html";
+          });
+        }
+      
+        // Bouton vider cache (ne touche pas l’auth)
+        const btnClearCache = document.getElementById('btnClearCache');
+        if (btnClearCache){
+          btnClearCache.addEventListener('click', function(){
+            if(!confirm('Vider les données d’images ?')) return;
+            localStorage.removeItem('projectImages');
+            alert('Cache images supprimé.');
+            document.dispatchEvent(new Event('projectImagesCleared'));
+          });
+        }
+      
+      })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gestion des projets — COR'BAT</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    /* Minimal admin styles for projects page (kept self-contained) */
+    body { font-family: 'Poppins', system-ui, Arial, sans-serif; background: #f6f7fb; color:#111; margin:0; }
+    .topbar { display:flex; align-items:center; gap:12px; padding:14px 20px; background:#000; color:#fff; }
+    .container { max-width:1100px; margin:24px auto; }
+    h1{margin:0 0 14px 0}
+    .card { background:#fff; padding:16px; border-radius:12px; box-shadow:0 8px 28px rgba(2,6,23,0.06); }
+    .controls { display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+    input.search { padding:8px 12px; border-radius:8px; border:1px solid #e6e9ef; min-width:220px; }
+    .btn { padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:600; }
+    .btn-primary { background: green; color:#ffffff; }
+    .btn-ghost { background:rgb(0, 225, 255); border:1px solid #ddd; color:#111; }
+    .btn-small { padding:6px 8px; font-size:0.9rem; border-radius:8px; }
+    table.table { width:100%; border-collapse:collapse; margin-top:8px; }
+    table.table th, table.table td { padding:10px 8px; border-bottom:1px solid #f1f3f6; text-align:left; vertical-align:middle; }
+    .thumb { width:90px; height:60px; object-fit:cover; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+    .actions { display:flex; gap:8px; align-items:center; }
+    .muted { color:#666; font-size:0.95rem; }
+    /* modal */
+    .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); z-index:9999; }
+    .modal.active { display:flex; }
+    .modal-panel { background:#fff; padding:20px; border-radius:12px; width:100%; max-width:760px; max-height:85vh; overflow:auto; box-shadow:0 14px 50px rgba(2,6,23,0.2); }
+    .modal-grid { display:grid; grid-template-columns:1fr 120px; gap:12px; align-items:start; }
+    .form-group { margin-bottom:10px; display:flex; flex-direction:column; gap:6px; }
+    label { font-weight:600; font-size:0.95rem; }
+    input[type="text"], input[type="number"], textarea, select { padding:10px; border:1px solid #e3e6ee; border-radius:8px; font-size:0.95rem; }
+    textarea { min-height:100px; resize:vertical; }
+    .images-preview { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .img-box { position:relative; width:90px; height:70px; border-radius:8px; overflow:hidden; }
+    .img-box img { width:100%; height:100%; object-fit:cover; display:block; }
+    .img-remove { position:absolute; right:4px; top:4px; background:rgba(0,0,0,0.6); color:#fff; border:0; width:20px; height:20px; border-radius:50%; cursor:pointer; font-weight:700; }
+    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .small { font-size:0.85rem; color:#666; }
+    .published { color: #10b981; font-weight:700; }
+    .unpublished { color:#ef4444; font-weight:700; }
+    @media (max-width:720px){
+      .modal-grid { grid-template-columns: 1fr; }
+      .thumb { width:72px; height:54px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">
+        <img src="../images/COR'BAT.png" alt="COR'BAT">
+      </span>
+      <span class="brand-name">Admin COR'BAT</span>
+    </div>
+    <!-- ======== NAVIGATION ======== -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+      <a href="devis.html" class="nav-link">Liste devis</a>
+      <a href="leads.html" class="nav-link">Clients intéressés</a>
+      <a href="projects.html" class="nav-link">Projets récents</a>
+      <a href="services.html" class="nav-link">Nos services</a>
+      <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+      <div class="admin-actions">
+        <button id="btnLogout" class="btn-logout">Se déconnecter</button>
+      </div>
+    </nav>
+  </header>
+  <!-- ======== STYLES (consolidés) ======== -->
+  <style>
+    /* === Header moderne === */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 40px;
+      background: linear-gradient(90deg,#000 0%, #000 100%);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+    /* Brand (logo + texte) */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .brand .logo img {
+      width: 48px;
+      height: auto;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .brand .brand-name {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      background: #ffffff;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand img { width:50px; height:auto; }
+    /* Nav alignée à droite */
+    .nav {
+      display: flex;
+      gap: 28px;
+      margin-left: auto; /* pousse le menu vers la droite */
+      align-items: center;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+      font-size: 1rem;
+      transition: color 0.25s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -6px;
+      left: 0;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      transition: width 0.25s ease;
+    }
+    .nav-link:hover {
+      color: #ffb400;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    /* Bouton Demander un devis */
+    .btn-devis {
+      padding: 8px 16px;
+      border-radius: 22px;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      color: #111;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(255,107,107,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-devis:hover {
+      transform: translateY(-2px);
+    }
+    .actios-bton {
+      display: flex;
+      gap: 8px;
+    }
+    /* Menu toggle (mobile) */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      margin-left: 12px;
+    }
+    .menu-toggle span {
+      width: 26px;
+      height: 3px;
+      background: #fff;
+      border-radius: 3px;
+    }
+    /* === Responsive === */
+    @media (max-width: 1024px) {
+      .nav {
+        display: none;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        background: #000;
+        flex-direction: column;
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        gap: 12px;
+        min-width: 200px;
+      }
+      .nav.active { display: flex; }
+      .menu-toggle { display: flex; }
+      .brand .brand-name { font-size: 1.1rem; }
+    }
+  </style>
+
+  <main class="container">
+    <h1>Gestion des projets</h1>
+
+    <div class="card" style="margin-top:12px">
+      <div class="controls">
+        <input id="searchInput" class="search" placeholder="Rechercher titre / année / tags..." />
+        <select id="filterPublished" style="padding:8px;border-radius:8px;border:1px solid #e6e9ef">
+          <option value="">Tous</option>
+          <option value="1">Publié</option>
+          <option value="0">Non publié</option>
+        </select>
+
+        <div style="margin-left:auto; display:flex; gap:8px;">
+          <button id="btnExport" class="btn btn-ghost btn-small">Exporter JSON</button>
+          <button id="btnAddProject" class="btn btn-primary">Nouveau projet</button>
+        </div>
+      </div>
+
+      <div style="overflow:auto; max-height:60vh; margin-top:6px;">
+        <table class="table" aria-describedby="projectsList">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Titre & détails</th>
+              <th>Année</th>
+              <th>Description</th>
+              <th>Statut</th>
+              <th style="width:170px">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="projectsTbody">
+            <!-- rows injected -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <!-- Modal create/edit -->
+  <div id="projectModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
+    <div class="modal-panel">
+      <h3 id="projectModalTitle">Nouveau projet</h3>
+      <div style="margin-bottom:8px" class="small">Remplissez les informations puis enregistrez.</div>
+
+      <form id="projectForm">
+        <div class="modal-grid">
+          <div>
+            <div class="form-group">
+              <label for="p_title">Titre</label>
+              <input id="p_title" name="title" type="text" required placeholder="Ex : Maison familiale — Antananarivo">
+            </div>
+
+            <div class="form-group">
+              <label for="p_description">Détails</label>
+              <textarea id="p_description" name="description" placeholder="Petite description"></textarea>
+            </div>
+
+            <div class="row">
+              <div style="flex:1" class="form-group">
+                <label for="p_year">Année</label>
+                <input id="p_year" name="year" type="number" min="1900" max="2100" placeholder="2024">
+              </div>
+              <div style="flex:1" class="form-group">
+                <label for="p_tags">Description (séparés par une virgule ",")</label>
+                <input id="p_tags" name="tags" placeholder="rénovation, intérieur">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="p_published">Publié</label>
+              <select id="p_published" name="published">
+                <option value="1">Oui (affichable sur portfolio)</option>
+                <option value="0">Non</option>
+              </select>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <button type="submit" class="btn btn-primary">Enregistrer</button>
+              <button type="button" id="btnCancel" class="btn btn-small js-delt" style="background:#ef4444;color:#fff">Annuler</button>
+              <button type="button" id="btnDeleteWhenEdit" style="display:none" class="btn btn-ghost">Supprimer</button>
+            </div>
+          </div>
+
+          <div>
+            <label>Images (max 20 Mo)</label>
+            <input id="p_files" type="file" accept="image/*" multiple>
+            <div class="images-preview" id="imagesPreview"></div>
+            <div class="small" style="margin-top:8px">Conseil : réduire la taille de l'image avant l'importation.</div>
+          </div>
+        </div>
+
+        <!-- hidden id -->
+        <input type="hidden" id="p_id" name="id" />
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (async function () {
+      const API_URL = "/api/projects";
+      const tbody = document.getElementById("projectsTbody");
+      const searchInput = document.getElementById("searchInput");
+      const filterPublished = document.getElementById("filterPublished");
+      const btnAddProject = document.getElementById("btnAddProject");
+      const btnExport = document.getElementById("btnExport");
+    
+      const modal = document.getElementById("projectModal");
+      const form = document.getElementById("projectForm");
+      const titleEl = document.getElementById("p_title");
+      const descEl = document.getElementById("p_description");
+      const yearEl = document.getElementById("p_year");
+      const tagsEl = document.getElementById("p_tags");
+      const publishedEl = document.getElementById("p_published");
+      const idEl = document.getElementById("p_id");
+      const btnCancel = document.getElementById("btnCancel");
+      const btnDeleteWhenEdit = document.getElementById("btnDeleteWhenEdit");
+      const filesInput = document.getElementById("p_files");
+      const imagesPreview = document.getElementById("imagesPreview");
+    
+      let projects = [];
+      // currentImages = array of dataURLs (strings)
+      let currentImages = [];
+    
+      // ---------- Helpers ----------
+      function safeParseJson(v) {
+        try { return JSON.parse(v); } catch (_) { return []; }
+      }
+    
+      function renderImagesPreview() {
+        imagesPreview.innerHTML = "";
+        currentImages.forEach((dataUrl, i) => {
+          const box = document.createElement("div");
+          box.className = "img-box";
+          const img = document.createElement("img");
+          img.src = dataUrl;
+          const btn = document.createElement("button");
+          btn.className = "img-remove";
+          btn.textContent = "×";
+          btn.addEventListener("click", () => {
+            currentImages.splice(i, 1);
+            renderImagesPreview();
+          });
+          box.appendChild(img);
+          box.appendChild(btn);
+          imagesPreview.appendChild(box);
+        });
+      }
+    
+      // read files input -> push dataURLs
+      filesInput.addEventListener("change", async (ev) => {
+        const files = Array.from(ev.target.files || []);
+        if (!files.length) return;
+        for (const f of files) {
+          if (f.size > 25 * 1024 * 1024) { alert(f.name + " dépasse 25MB — ❌ non ajouté"); continue; }
+          const d = await new Promise((res, rej) => {
+            const r = new FileReader();
+            r.onload = () => res(r.result);
+            r.onerror = rej;
+            r.readAsDataURL(f);
+          });
+          currentImages.push(d);
+          renderImagesPreview();
+        }
+        // reset input so same file can be reselected later
+        filesInput.value = "";
+      });
+    
+      // ---------- Fetch projects ----------
+      async function fetchProjects() {
+        try {
+          const res = await fetch(API_URL);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          projects = data.map(p => ({
+            ...p,
+            tags: Array.isArray(p.tags) ? p.tags : (typeof p.tags === "string" ? safeParseJson(p.tags) : []),
+            images: Array.isArray(p.images) ? p.images : (typeof p.images === "string" ? safeParseJson(p.images) : []),
+            published: !!p.published
+          }));
+          renderList();
+        } catch (err) {
+          console.error("Erreur fetchProjects:", err);
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#999;padding:16px">❌ Impossible de charger les projets (${err.message})</td></tr>`;
+        }
+      }
+    
+      // ---------- Render ----------
+      function renderList() {
+        const q = (searchInput.value || "").toLowerCase();
+        const pub = filterPublished.value;
+        let rows = projects.slice();
+        if (pub === "1") rows = rows.filter(p => p.published);
+        if (pub === "0") rows = rows.filter(p => !p.published);
+        if (q) rows = rows.filter(p => ((p.title||"") + " " + (p.description||"") + " " + (p.year||"") + " " + (p.tags||[]).join(" ")).toLowerCase().includes(q));
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="6" style="padding:16px;text-align:center;color:#777;">Aucun projet trouvé.</td></tr>`;
+          return;
+        }
+    
+        tbody.innerHTML = rows.map(p => {
+          // image source: if p.images[0] looks like dataURL or remote URL, use it; otherwise placeholder
+          const imgSrc = (p.images && p.images.length && p.images[0]) ? p.images[0] : "../images/placeholder.jpg";
+          // escape basic
+          const esc = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+          return `
+            <tr>
+              <td><img src="${imgSrc}" class="thumb" alt="Aperçu" onerror="this.src='../images/placeholder.jpg'"></td>
+              <td><strong>${esc(p.title)}</strong><br><small>${esc(p.description)}</small></td>
+              <td>${esc(p.year) || "-"}</td>
+              <td>${(p.tags||[]).map(t=>esc(t)).join(", ")}</td>
+              <td>${p.published ? "<span class='published'>Publié</span>" : "<span class='unpublished'>Non publié</span>"}</td>
+              <td>
+                <div class="actios-bton">
+                  <button class="btn btn-ghost js-edit" data-id="${p.id}">Modifier</button>
+                  <button class="btn btn-small js-pub" data-id="${p.id}">${p.published ? "Dépublier" : "Publier"}</button>
+                  <button class="btn btn-small js-del" style="background:#ef4444;color:#fff" data-id="${p.id}">Supprimer</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
+    
+        document.querySelectorAll(".js-edit").forEach(b => (b.onclick = openEdit));
+        document.querySelectorAll(".js-del").forEach(b => (b.onclick = onDelete));
+        document.querySelectorAll(".js-pub").forEach(b => (b.onclick = onToggle));
+      }
+    
+      // ---------- Delete (from list) ----------
+      async function onDelete(e) {
+        const id = e.currentTarget.dataset.id;
+        if (!id) { alert("ID invalide"); return; }
+        if (!confirm("Voulez-vous vraiment supprimer ce projet ?")) return;
+        try {
+          const res = await fetch(`${API_URL}/${encodeURIComponent(id)}`, { method: "DELETE" });
+          if (!res.ok) {
+            const txt = await res.text().catch(()=>"");
+            throw new Error(`HTTP ${res.status} ${txt}`);
+          }
+          await fetchProjects();
+          alert("✅ Projet supprimé avec succès !");
+        } catch (err) {
+          console.error("❌ Erreur suppression projet:", err);
+          alert("❌ Erreur lors de la suppression: " + err.message);
+        }
+      }
+    
+      // ---------- Delete (from modal) ----------
+      async function onDeleteFromModal() {
+        const id = idEl.value;
+        if (!id) return alert("Aucun projet sélectionné pour suppression.");
+        if (!confirm("Voulez-vous vraiment supprimer ce projet ?")) return;
+        try {
+          const res = await fetch(`${API_URL}/${encodeURIComponent(id)}`, { method: "DELETE" });
+          if (!res.ok) {
+            const txt = await res.text().catch(()=>"");
+            throw new Error(`HTTP ${res.status} ${txt}`);
+          }
+          closeModal();
+          await fetchProjects();
+          alert("✅ Projet supprimé avec succès !");
+        } catch (err) {
+          console.error("❌ Erreur suppression depuis modal:", err);
+          alert("❌ Erreur lors de la suppression: " + err.message);
+        }
+      }
+    
+      // ---------- Publish toggle ----------
+      async function onToggle(e) {
+        const id = e.currentTarget.dataset.id;
+        const project = projects.find(p => p.id === id);
+        if (!project) return alert("❌ Projet introuvable");
+        const newStatus = !project.published;
+        try {
+          const res = await fetch(`${API_URL}/${encodeURIComponent(id)}/publish`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ published: newStatus })
+          });
+          if (!res.ok) {
+            const txt = await res.text().catch(()=>"");
+            throw new Error(`HTTP ${res.status} ${txt}`);
+          }
+          await fetchProjects();
+        } catch (err) {
+          console.error("❌Erreur toggle projet:", err);
+          alert("❌ Erreur lors du changement de statut: " + err.message);
+        }
+      }
+    
+      // ---------- Open edit (modal) ----------
+      function openEdit(e) {
+        const id = e.currentTarget.dataset.id;
+        const p = projects.find(x => x.id === id);
+        if (!p) return alert("❌Projet introuvable");
+        idEl.value = p.id;
+        titleEl.value = p.title || "";
+        descEl.value = p.description || "";
+        yearEl.value = p.year || "";
+        tagsEl.value = (p.tags || []).join(", ");
+        publishedEl.value = p.published ? "1" : "0";
+        // currentImages <- p.images (may be dataURLs or full urls)
+        currentImages = Array.isArray(p.images) ? p.images.slice() : [];
+        renderImagesPreview();
+        openModal(true);
+      }
+    
+      // ---------- Create / Update submit ----------
+      form.addEventListener("submit", async e => {
+        e.preventDefault();
+        const title = titleEl.value.trim();
+        if (!title) return alert("Le titre est requis");
+        const payload = {
+          title,
+          description: descEl.value.trim(),
+          year: String(yearEl.value || ""),
+          tags: tagsEl.value.split(",").map(t => t.trim()).filter(Boolean),
+          published: publishedEl.value === "1",
+          images: currentImages.slice() // array of dataURLs or urls
+        };
+        const id = idEl.value;
+        const method = id ? "PATCH" : "POST";
+        const url = id ? `${API_URL}/${encodeURIComponent(id)}` : API_URL;
+        try {
+          const res = await fetch(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) {
+            const txt = await res.text().catch(()=>"");
+            throw new Error(`HTTP ${res.status} ${txt}`);
+          }
+          closeModal();
+          await fetchProjects();
+          alert("✅ Projet enregistré avec succès !");
+        } catch (err) {
+          console.error("❌ Erreur ajout/modif projet:", err);
+          alert("❌ Erreur lors de l'enregistrement du projet: " + err.message);
+        }
+      });
+    
+      // ---------- Modal helpers ----------
+      function openModal(edit = false) {
+        modal.classList.add("active");
+        document.getElementById("projectModalTitle").textContent = edit ? "Modifier le projet" : "Nouveau projet";
+        btnDeleteWhenEdit.style.display = edit ? "inline-block" : "none";
+      }
+      function closeModal() {
+        modal.classList.remove("active");
+        form.reset();
+        idEl.value = "";
+        currentImages = [];
+        renderImagesPreview();
+      }
+      btnAddProject.onclick = () => { form.reset(); currentImages = []; renderImagesPreview(); openModal(false); };
+      btnCancel.onclick = closeModal;
+      // replace old click binding: use modal-specific delete
+      btnDeleteWhenEdit.onclick = onDeleteFromModal;
+    
+      // ---------- Export ----------
+      btnExport.onclick = () => {
+        const blob = new Blob([JSON.stringify(projects, null, 2)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "btp_projects.json";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      };
+    
+      searchInput.oninput = renderList;
+      filterPublished.onchange = renderList;
+    
+      // initial load
+      fetchProjects();
+    })();
+  </script>
+  <!-- ========== Admin Footer ========== -->
+  <footer class="admin-footer" role="contentinfo" aria-label="Pied de page administration">
+    <div class="admin-footer-inner">
+      <div class="admin-left">
+        <div class="admin-brand">
+          <img src="../images/COR'BAT.png" alt="COR'BAT" />
+          <div>
+            <strong>Admin COR'BAT</strong>
+            <div class="small muted">Espace administrateur</div>
+          </div>
+        </div>
+  
+        <div class="admin-contact dev-credit">
+          <div>Développé par : <strong>Kenny R.</strong></div>
+          <div>Tél : <a href="tel:+261331916764">+261 33 19 167 64</a></div>
+          <div>Email : <a href="mailto:ramarielina2604@gmail.com">ramarielina2604@gmail.com</a></div>
+        </div>      
+      </div>
+  
+      <div class="admin-right">
+        <nav class="admin-links" aria-label="Liens utilitaires admin">
+          <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+          <a href="devis.html" class="nav-link">Devis</a>
+          <a href="leads.html" class="nav-link">Clients</a>
+          <a href="projects.html" class="nav-link">Projets</a>
+          <a href="services.html" class="nav-link">Services</a>
+          <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+        </nav>
+      </div>
+    </div>
+  
+    <div class="admin-footer-bottom">
+      <small>© <span id="adminYear"></span> COR'BAT — Espace Admin • Tous droits réservés.</small>
+    </div>
+  </footer>
+  <!-- ====== Styles pour admin-footer ====== -->
+  <style>
+    .admin-footer {
+      background:#070707;
+      color:#e6e6e6;
+      padding:18px 24px;
+      border-top:1px solid rgba(255,255,255,0.04);
+      font-family: 'Poppins', sans-serif;
+      margin-top:32px;
+    }
+    .admin-footer-inner {
+      display:flex;
+      gap:20px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .admin-left { display:flex; gap:14px; align-items:center; min-width:200px; }
+    .admin-brand img { width:44px; height:44px; object-fit:contain; border-radius:8px; }
+    .admin-brand strong { display:block; color:#fff; }
+    .small { font-size:0.87rem; }
+    .muted { color:#a9a9a9; }
+    .admin-center { flex:1; display:flex; justify-content:center; }
+    .kpis { display:flex; gap:22px; align-items:center; }
+    .kpi { text-align:center; min-width:88px; }
+    .kpi-value { font-weight:700; font-size:1.25rem; color:linear-gradient(90deg,#ffb400,#ff6b6b); }
+    .kpi-label { font-size:0.85rem; color:#bdbdbd; }
+    .admin-right { display:flex; gap:14px; align-items:center; min-width:220px; justify-content:flex-end; }
+    .admin-links { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .admin-links a { color:#dfe6ef; text-decoration:none; font-size:0.95rem; padding:6px 8px; border-radius:6px; }
+    .admin-links a:hover { background:rgba(255,255,255,0.02); color:#fff; }
+    .admin-actions { display:flex; gap:8px; align-items:center; }
+    .btn-ghost.small { padding:6px 10px; background:transparent; color:#ccc; border:1px solid rgba(255,255,255,0.03); border-radius:8px; cursor:pointer; }
+    .btn-logout { background:#ef4444; color:#ffffff; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
+    .admin-footer-bottom { text-align:center; margin-top:12px; color:#9a9a9a; font-size:0.88rem; border-top:1px solid rgba(255,255,255,0.02); padding-top:10px; }
+    .dev-credit {
+      position: fixed;
+      bottom: 10px;
+      right: 14px;
+      font-size: 0.68rem;
+      opacity: 0.25;
+      color: #ffffff; /* si fond clair → change en #555 */
+      line-height: 1.25;
+      text-align: right;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 9999;
+    }
+    .dev-credit a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .dev-credit:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    /* Responsive */
+    @media (max-width:880px){
+      .admin-footer-inner { flex-direction:column; align-items:stretch; gap:12px; }
+      .admin-center { order:3; justify-content:space-between; }
+      .admin-right { justify-content:space-between; }
+    }
+  </style>
+  
+  <script>
+    (function(){
+      // Mise à jour de l'année footer
+      document.getElementById('adminYear').textContent = new Date().getFullYear();
+    
+      // Déconnexion via backend (efface cookie)
+      const btnLogout = document.getElementById('btnLogout');
+      if (btnLogout) {
+        btnLogout.addEventListener('click', async function(){
+          if(!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
+    
+          await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include"
+          });
+    
+          // Nettoyage des ancien restes locaux (optionnel mais propre)
+          localStorage.removeItem('btp_admin_logged');
+          localStorage.removeItem('btp_admin_token');
+          sessionStorage.removeItem('btp_admin_logged');
+          sessionStorage.removeItem('btp_admin_token');
+    
+          window.location.href = "login.html";
+        });
+      }
+    
+      // Bouton vider cache (ne touche pas l’auth)
+      const btnClearCache = document.getElementById('btnClearCache');
+      if (btnClearCache){
+        btnClearCache.addEventListener('click', function(){
+          if(!confirm('Vider les données d’images ?')) return;
+          localStorage.removeItem('projectImages');
+          alert('Cache images supprimé.');
+          document.dispatchEvent(new Event('projectImagesCleared'));
+        });
+      }
+    
+    })();
+  </script>
+</body>
+</html>

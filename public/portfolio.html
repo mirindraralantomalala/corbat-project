@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portfolio — COR'BAT</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">
+        <img src="images/COR'BAT.png" alt="COR'BAT">
+      </span>
+      <span class="brand-name">COR'BAT</span>
+    </div>
+    <!-- ======== NAVIGATION ======== -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <a href="index.html" class="nav-link">Accueil</a>
+      <a href="services.html" class="nav-link">Services</a>
+      <a href="portfolio.html" class="nav-link">Portfolio</a>
+      <a href="devis.html" class="nav-link">Demander un devis</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+      <a href="about.html" class="nav-link">À propos</a>
+      <!-- Lien Admin (invisible par défaut) -->
+      <a href="admin/login.html"
+         class="nav-link admin-link"
+         id="adminMenu"
+         style="display:none;"
+         aria-hidden="true"
+         tabindex="-1">Admin</a>
+    </nav>
+  </header>
+  <!-- ======== STYLES (consolidés) ======== -->
+  <style>
+    /* === Header moderne === */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 40px;
+      background: linear-gradient(90deg,#000 0%, #000 100%);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+    /* Brand (logo + texte) */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .brand .logo img {
+      width: 48px;
+      height: auto;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    /* Degradé sur le texte de la marque (jaune/orange) */
+    .brand .brand-name {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      background: #ffffff;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    /* Nav alignée à droite */
+    .nav {
+      display: flex;
+      gap: 28px;
+      margin-left: auto; /* pousse le menu vers la droite */
+      align-items: center;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+      font-size: 1rem;
+      transition: color 0.25s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -6px;
+      left: 0;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      transition: width 0.25s ease;
+    }
+    .nav-link:hover {
+      color: #ffb400;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    /* Bouton Demander un devis */
+    .btn-devis {
+      padding: 8px 16px;
+      border-radius: 22px;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      color: #111;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(255,107,107,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-devis:hover {
+      transform: translateY(-2px);
+    }
+    /* Style spécial pour le lien Admin (quand visible) */
+    .admin-link {
+      color: #ff6b6b;
+      font-weight: 700;
+      border: 1px solid rgba(255,107,107,0.25);
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+    }
+    .admin-link:hover {
+      background: #ff6b6b;
+      color: white;
+    }
+    /* Menu toggle (mobile) */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      margin-left: 12px;
+    }
+    .menu-toggle span {
+      width: 26px;
+      height: 3px;
+      background: #fff;
+      border-radius: 3px;
+    }
+    /* === Responsive === */
+    @media (max-width: 1024px) {
+      .nav {
+        display: none;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        background: #000;
+        flex-direction: column;
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        gap: 12px;
+        min-width: 200px;
+      }
+      .nav.active { display: flex; }
+      .menu-toggle { display: flex; }
+      .brand .brand-name { font-size: 1.1rem; }
+    }
+  </style>
+  <!-- ======== SCRIPT DE PROTECTION CTRL + A (sans localStorage) ======== -->
+  <script>
+    (function () {
+    
+      const adminPassword = "MotDePasseCorbatAdministration"; // ton mot de passe d'accès secret
+      const DISPLAY_DURATION_MS = 60_000; // durée d'affichage 1 min
+    
+      let hideAdminTimeout = null;
+    
+      const adminMenu = document.getElementById('adminMenu');
+      const nav = document.querySelector('.nav');
+      const menuToggle = document.getElementById('menuToggle');
+    
+      // Cacher par défaut
+      const hideAdmin = () => {
+        if (!adminMenu) return;
+        adminMenu.style.display = 'none';
+        adminMenu.setAttribute('aria-hidden', 'true');
+        adminMenu.setAttribute('tabindex', '-1');
+      };
+    
+      const showAdmin = () => {
+        if (!adminMenu) return;
+        adminMenu.style.display = 'inline-block';
+        adminMenu.setAttribute('aria-hidden', 'false');
+        adminMenu.setAttribute('tabindex', '0');
+    
+        /* Effacer toute trace d’auth locale (au cas où) */
+        localStorage.removeItem('btp_admin_logged');
+        localStorage.removeItem('btp_admin_token');
+        sessionStorage.removeItem('btp_admin_token');
+      };
+    
+      hideAdmin(); // caché au démarrage
+    
+      // Cliquer → masque directement
+      adminMenu?.addEventListener('click', () => {
+        hideAdmin();
+        if (hideAdminTimeout) clearTimeout(hideAdminTimeout);
+      });
+    
+      // Empêcher focus si caché
+      adminMenu?.addEventListener('keydown', (e) => {
+        if (adminMenu.style.display === 'none') e.preventDefault();
+      });
+    
+      // demande mot de passe → affiche menu temporairement
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'b') {
+          e.preventDefault(); // empêche "la fonctionnaliter par defaut"
+          const pass = prompt("🔐 Entrer le mot de passe administrateur :");
+          if (pass === adminPassword) {
+    
+            showAdmin();
+    
+            if (hideAdminTimeout) clearTimeout(hideAdminTimeout);
+            hideAdminTimeout = setTimeout(() => {
+              hideAdmin();
+              alert("⌛ Lien admin caché automatiquement.");
+            }, DISPLAY_DURATION_MS);
+    
+            alert("✅ Lien admin activé temporairement !");
+          } else {
+            alert("⛔ Mot de passe incorrect.");
+          }
+        }
+      });
+    
+      // Menu responsive
+      if (menuToggle && nav) {
+        menuToggle.addEventListener('click', () => {
+          nav.classList.toggle('active');
+        });
+      }
+    
+    })();
+  </script>
+
+  <main class="container section">
+    <section class="animate-section container portfolio-section">
+      <h1>Nos réalisations</h1>
+      <p>Chaque projet que nous menons est le reflet d’un savoir-faire maîtrisé, d’une exigence de qualité et d’une attention minutieuse portée à chaque détail. De la conception à la finition, nous créons des espaces élégants, durables et parfaitement adaptés aux besoins de nos clients. Découvrez des réalisations qui allient esthétique, performance et excellence technique.</p>
+    
+      <div id="portfolioGrid" class="portfolio-grid" aria-live="polite">
+        <!-- projets publiés injectés ici -->
+      </div>      
+    </section>
+    
+    <style>
+      /* === Portfolio Section === */
+      .portfolio-section {
+        position: relative;
+        background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+        z-index: 1;
+      }
+      .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+      }
+      /* --- Animation d’apparition --- */
+      .portfolio-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transform: translateY(50px);
+        opacity: 0;
+        transition: all 0.8s ease;
+        cursor: pointer;
+      }
+      .portfolio-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      /* --- Effet hover --- */
+      .portfolio-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      }
+      .card-image img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        transition: transform 1s ease, filter 1s ease;
+      }
+      .portfolio-card:hover .card-image img {
+        transform: scale(1.15);
+        filter: brightness(1.1) contrast(1.05);
+      }
+      .card-info {
+        text-align: center;
+        padding: 15px;
+      }
+      .card-info p {
+        color: #555;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+    </style>
+    
+    <script>
+      // === Apparition progressive des cartes ===
+      const portfolioCards = document.querySelectorAll('.portfolio-card');
+      
+      function revealPortfolio() {
+        const windowHeight = window.innerHeight;
+        portfolioCards.forEach(card => {
+          const cardTop = card.getBoundingClientRect().top;
+          if (cardTop < windowHeight - 100) {
+            card.classList.add('visible');
+          }
+        });
+      }
+      
+      window.addEventListener('scroll', revealPortfolio);
+      window.addEventListener('load', revealPortfolio);
+    </script>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-about">
+        <div class="footer-brand">
+          <h4>COR'BAT</h4>
+          <span class="company-badge">Entreprise</span>
+        </div>
+        <p class="lux-separator">Construction <span class="star">★</span> Rénovation <span class="star">★</span> Design</p>
+        <p>
+          <svg xmlns="http://www.w3.org/2000/svg"
+          width="24" height="24"
+          viewBox="0 0 64 64"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+        <!-- Cercle -->
+        <circle cx="32" cy="32" r="30"
+                stroke="#E0E0E0"
+                stroke-width="2"/>
+        <!-- Téléphone -->
+        <path d="M22 10
+                h12
+                a4 4 0 0 1 4 4
+                v36
+                a4 4 0 0 1 -4 4
+                h-12
+                a4 4 0 0 1 -4 -4
+                v-36
+                a4 4 0 0 1 4 -4
+                z"
+              stroke="#0A66C2"
+              stroke-width="2.5"/>
+        <circle cx="28" cy="48" r="1.5" fill="#0A66C2"/>
+        <!-- Ondes WiFi à droite -->
+        <path d="M42 26
+                a6 6 0 0 1 0 12"
+              stroke="#2ECC71"
+              stroke-width="2"/>
+        <path d="M46 23
+                a9 9 0 0 1 0 18"
+              stroke="#2ECC71"
+              stroke-width="2"/>
+        <path d="M50 20
+                a12 12 0 0 1 0 24"
+              stroke="#2ECC71"
+              stroke-width="2"/>
+        </svg>
+          Tél : 
+          <a href="tel:+261338790262">+261 33 87 902 62</a> •
+          <a href="tel:+261376341770">+261 37 63 417 70</a> •
+          <a href="tel:+261380881659">+261 38 08 816 59</a>
+        </p>      
+        <p>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="30" stroke="#E0E0E0" stroke-width="2"/>
+            <rect x="16" y="22" width="32" height="20" rx="3" stroke="#EA4335" stroke-width="2.5"/>
+            <path d="M16 24 L32 36 L48 24" stroke="#EA4335" stroke-width="2.5"/>
+          </svg>          
+          Email : <a href="mailto:corbatmadagascar@gmail.com">corbatmadagascar@gmail.com</a></p>
+      </div>
+  
+      <div class="footer-social">
+        <h4>Suivez-nous</h4>
+        <div class="social-links">
+          <a href="https://www.facebook.com/profile.php?id=61584050241087" target="_blank" aria-label="Facebook" class="social facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://wa.me/261338790262" target="_blank" aria-label="WhatsApp" class="social whatsapp"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://www.instagram.com/corbat_construction" target="_blank" aria-label="Instagram" class="social instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/in/corbat-construction-82079939b" target="_blank" aria-label="LinkedIn" class="social linkedin"><i class="fab fa-linkedin-in"></i></a>  
+        </div>
+      </div>
+    </div>
+  
+    <div class="footer-bottom">
+      <p>© 2025 COR'BAT. Tous droits réservés.</p>
+      <p class="dev-credit">
+        Développé par <a href="https://wa.me/261331916764" target="_blank">Kenny R.</a> — <span class="role">Développeur Web</span>
+      </p>
+    </div>
+  </footer>
+  
+  <style>
+    /* === Footer moderne === */
+    .site-footer {
+      background: #000000;
+      color: #fff;
+      padding: 50px 40px 20px 40px;
+      font-family: 'Poppins', sans-serif;
+      border-top-left-radius: 25px;
+      border-top-right-radius: 25px;
+      box-shadow: 0 -5px 25px rgba(0,0,0,0.1);
+    }
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 40px;
+    }
+    .footer-about h4, .footer-social h4 {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    .footer-about p, .footer-about a {
+      font-size: 1rem;
+      color: #f0f0f0;
+      text-decoration: none;
+      margin-bottom: 6px;
+      transition: color 0.3s ease;
+    }
+    .footer-about a:hover {
+      color: #FFD700;
+    }
+    .footer-social h4 {
+      margin-left: 90px;
+    }
+    .footer-social .social-links {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+      margin-left: 40%;
+    }
+    .footer-social .social {
+      font-size: 1.8rem;
+      color: #fff;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .footer-social .social:hover {
+      transform: translateY(-5px) scale(1.1);
+    }
+    .footer-social .facebook:hover { color: #1877f2; }
+    .footer-social .whatsapp:hover { color: #25D366; }
+    .footer-social .instagram:hover { color: #E4405F; }
+    .footer-social .linkedin:hover { color: #0a66c2; }
+    .footer-bottom {
+      text-align: center;
+      margin-top: 35px;
+      font-size: 0.95rem;
+      color: #ccc;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 15px;
+    }
+    .footer-bottom {
+      text-align: center;
+      padding: 12px 0;
+      font-size: 14px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .footer-bottom .dev-credit {
+      margin-top: 4px;
+      font-size: 11.5px; /* petit et fin */
+      opacity: 0.45; /* discret */
+      transition: opacity 0.3s;
+    }
+    .footer-bottom .dev-credit:hover {
+      opacity: 0.8; /* plus visible quand on passe la souris */
+    }
+    .footer-bottom .dev-credit a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .footer-bottom .dev-credit a:hover {
+      text-decoration: underline;
+    }
+    .footer-bottom .dev-credit .role {
+      font-style: italic;
+      opacity: 0.7;
+    }
+    .lux-separator {
+      font-size: 19px;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+      color: #2a2a2a;
+      font-family: "Georgia", serif;
+    }
+    .lux-separator .star {
+      padding: 0 10px;
+      font-size: 22px;
+      color: #d4af37;      /* or royal */
+      text-shadow: 0 0 4px rgba(212, 175, 55, 0.6);
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .company-badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #111, #333);
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+  </style>
+
+  <script src="js/script.js"></script>
+
+  <script>
+    (async function(){
+      const API_URL = "/api/projects-public";
+      const grid = document.getElementById("portfolioGrid");
+    
+      // --- helpers ---
+      function safe(v){ return v === undefined || v === null ? '' : String(v); }
+      function el(tag, attrs={}, html=''){
+        const n = document.createElement(tag);
+        for(const k in attrs){
+          if(k === 'class') n.className = attrs[k];
+          else if(k === 'text') n.textContent = attrs[k];
+          else n.setAttribute(k, attrs[k]);
+        }
+        if(html) n.innerHTML = html;
+        return n;
+      }
+    
+      // --- charger projets depuis backend ---
+      async function fetchProjects(){
+        try {
+          const res = await fetch(API_URL);
+          if(!res.ok) throw new Error(`❌ Erreur HTTP ${res.status}`);
+          const data = await res.json();
+          // filtrer les projets publiés
+          return data.filter(p => p.published === 1 || p.published === true);
+        } catch(err){
+          console.error("❌ Erreur lors du chargement des projets:", err);
+          grid.innerHTML = `<div style="padding:24px;color:#666">❌ Impossible de charger les projets (${err.message})</div>`;
+          return [];
+        }
+      }
+    
+      // --- afficher projets ---
+      async function renderProjects(){
+        const projects = await fetchProjects();
+        if(!projects.length){
+          grid.innerHTML = `<div style="padding:24px;color:#666;text-align:center;">Aucun projet publié pour le moment.</div>`;
+          return;
+        }
+    
+        grid.innerHTML = "";
+    
+        for(const p of projects){
+          let images = [];
+          try {
+            images = typeof p.images === "string" ? JSON.parse(p.images || "[]") : (p.images || []);
+          } catch(e){ images = []; }
+    
+          const imgSrc = images.length ? images[0] : "images/placeholder.jpg";
+    
+          const card = el("div", { class: "portfolio-card" });
+          const imgWrap = el("div", { class: "card-image" });
+          const img = el("img", { src: imgSrc, alt: safe(p.title) });
+          imgWrap.appendChild(img);
+    
+          const info = el("div", { class: "card-info" });
+          const title = el("h3", {}, safe(p.title));
+          const metaText = (p.year ? `${p.year}${p.tags && p.tags.length ? " • " : ""}` : "")
+                          + (Array.isArray(p.tags) ? p.tags.join(", ") : (typeof p.tags === "string" ? p.tags : ""));
+          const meta = el("p", { class: "muted" }, metaText);
+          const desc = el("p", { class: "muted" }, (p.description || "").slice(0, 180) + "...");
+          info.append(title, meta, desc);
+    
+          card.append(imgWrap, info);
+    
+          // clic = ouvrir détails
+          card.addEventListener("click", ()=>{
+            const w = window.open("", "_blank");
+            if(!w){
+              alert("Autorisez les popups pour voir le détail.");
+              return;
+            }
+
+            // Empêche la répétition de l’année
+            let cleanMeta = metaText.replace(p.year, "").trim();
+            cleanMeta = cleanMeta.replace(/^•\s*/, "");
+
+            const gallery = images
+              .map(src => `<img src="${src}" class="img-item" />`)
+              .join("");
+
+            const html = `
+            <!doctype html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width,initial-scale=1">
+              <title>${safe(p.title)}</title>
+
+              <style>
+                body{
+                  font-family:'Poppins',sans-serif;
+                  margin:0;
+                  background:#f6f7fb;
+                  color:#111;
+                }
+
+                /* HEADER */
+                .header{
+                  background:#111827;
+                  color:white;
+                  padding:26px 20px;
+                  text-align:center;
+                  box-shadow:0 2px 10px rgba(0,0,0,0.2);
+                }
+                .header h1{
+                  margin:0;
+                  font-size:26px;
+                  font-weight:700;
+                }
+                .header .meta{
+                  margin-top:6px;
+                  color:#cbd5e1;
+                  font-size:15px;
+                }
+
+                /* CONTAINER */
+                .container{
+                  max-width:900px;
+                  margin:20px auto;
+                  background:white;
+                  padding:20px;
+                  border-radius:12px;
+                  box-shadow:0 4px 18px rgba(0,0,0,0.06);
+                  animation:fadeIn .4s ease-out;
+                }
+
+                @keyframes fadeIn{
+                  from{opacity:0;transform:translateY(15px)}
+                  to{opacity:1;transform:translateY(0)}
+                }
+
+                p{
+                  font-size:16px;
+                  line-height:1.6;
+                  color:#333;
+                }
+
+                /* GALLERY */
+                .gallery{
+                  margin-top:18px;
+                  display:grid;
+                  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+                  gap:15px;
+                }
+                .gallery img{
+                  width:100%;
+                  border-radius:10px;
+                  object-fit:cover;
+                  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+                  transition:.3s;
+                  cursor:zoom-in;
+                }
+                .gallery img:hover{
+                  transform:scale(1.02);
+                  box-shadow:0 4px 18px rgba(0,0,0,0.2);
+                }
+
+                .no-img{
+                  color:#777;
+                  font-style:italic;
+                  margin-top:20px;
+                  text-align:center;
+                }
+              </style>
+            </head>
+
+            <body>
+
+              <div class="header">
+                <h1>${safe(p.title)}</h1>
+                <div class="meta">
+                  ${safe(p.year || "")}
+                  ${cleanMeta ? " • " + cleanMeta : ""}
+                </div>
+              </div>
+
+              <div class="container">
+                <p>${safe(p.description || "")}</p>
+
+                ${
+                  gallery
+                    ? `<div class="gallery">${gallery}</div>`
+                    : `<div class="no-img">Aucune image disponible</div>`
+                }
+              </div>
+
+            </body>
+            </html>
+            `;
+
+            w.document.open();
+            w.document.write(html);
+            w.document.close();
+          });
+          grid.appendChild(card);
+          }
+          
+        // Animation d’apparition
+        function revealPortfolio(){
+          const cards = grid.querySelectorAll(".portfolio-card");
+          const winH = window.innerHeight;
+          cards.forEach(card=>{
+            const top = card.getBoundingClientRect().top;
+            if(top < winH - 80) card.classList.add("visible");
+          });
+        }
+        revealPortfolio();
+        window.addEventListener("scroll", revealPortfolio);
+      }
+    
+      // --- lancement ---
+      renderProjects();
+    })();
+  </script>
+</body>
+</html>

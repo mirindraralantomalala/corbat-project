@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Tableau de bord — COR'BAT</title><link rel="stylesheet" href="../css/style.css"/></head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">
+        <img src="../images/COR'BAT.png" alt="COR'BAT">
+      </span>
+      <span class="brand-name">Admin COR'BAT</span>
+    </div>
+    <!-- ======== NAVIGATION ======== -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+      <a href="devis.html" class="nav-link">Liste devis</a>
+      <a href="leads.html" class="nav-link">Clients intéressés</a>
+      <a href="projects.html" class="nav-link">Projets récents</a>
+      <a href="services.html" class="nav-link">Nos services</a>
+      <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+      <div class="admin-actions">
+        <button id="btnChangePass" class="btn-ghost small">Changer mot de passe</button>
+        <button id="btnLogout" class="btn-logout">Se déconnecter</button>
+      </div>
+    </nav>
+  </header>
+  <!-- ======== STYLES (consolidés) ======== -->
+  <style>
+    /* ===== Bouton "Changer mot de passe" moderne ===== */
+    #btnChangePass {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: #e6e6e6;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+      backdrop-filter: blur(6px);
+    }
+    /* Hover effet premium */
+    #btnChangePass:hover {
+      background: linear-gradient(90deg, #ffb400 0%, #ff6b6b 100%);
+      border-color: transparent;
+      color: #111;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(255,107,107,0.25);
+    }
+    /* Petit effet lors du clic */
+    #btnChangePass:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 10px rgba(255,107,107,0.18);
+    }
+    /* === Header moderne === */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 40px;
+      background: linear-gradient(90deg,#000 0%, #000 100%);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+    /* Brand (logo + texte) */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .brand .logo img {
+      width: 48px;
+      height: auto;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .brand .brand-name {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      background: #ffffff;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand img { width:50px; height:auto; }
+    /* Nav alignée à droite */
+    .nav {
+      display: flex;
+      gap: 28px;
+      margin-left: auto; /* pousse le menu vers la droite */
+      align-items: center;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+      font-size: 1rem;
+      transition: color 0.25s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -6px;
+      left: 0;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      transition: width 0.25s ease;
+    }
+    .nav-link:hover {
+      color: #ffb400;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    /* Bouton Demander un devis */
+    .btn-devis {
+      padding: 8px 16px;
+      border-radius: 22px;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      color: #111;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(255,107,107,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-devis:hover {
+      transform: translateY(-2px);
+    }
+    /* Menu toggle (mobile) */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      margin-left: 12px;
+    }
+    .menu-toggle span {
+      width: 26px;
+      height: 3px;
+      background: #fff;
+      border-radius: 3px;
+    }
+    /* === Responsive === */
+    @media (max-width: 1024px) {
+      .nav {
+        display: none;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        background: #000;
+        flex-direction: column;
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        gap: 12px;
+        min-width: 200px;
+      }
+      .nav.active { display: flex; }
+      .menu-toggle { display: flex; }
+      .brand .brand-name { font-size: 1.1rem; }
+    }
+  </style>
+
+  <main class="container section">
+    <h1>Tableau de bord</h1>
+    <div class="grid-3">
+      <div class="card"><h3 id="kpiLeads">0</h3><p class="muted">Clients intéressés</p></div>
+      <div class="card"><h3 id="kpiProjects">0</h3><p class="muted">Projets en cours</p></div>
+    </div>
+
+    <section class="card" style="margin-top:20px">
+      <h3>Graphiques</h3>
+      <canvas id="adminChart" style="width:100%;height:240px"></canvas>
+    </section>
+
+    <section class="card" style="margin-top:20px">
+      <h3>Paramètres aperçu rapide</h3>
+      <div style="margin-bottom:12px;">
+        <label>Nombre de projets en cours :</label>
+        <input type="number" id="adminProjectCount" min="0" style="width:80px;">
+        <button class="btn-primary" id="saveCountBtn">Enregistrer</button>
+      </div>
+      <h4>Images des projets en cours</h4>
+      <input type="file" id="imageUploader" multiple accept="image/*">
+      <div id="previewImages" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;"></div>
+    </section>
+
+    <section class="card" style="margin-top:20px;">
+      <h3>Membres de l'équipe</h3>
+      <div style="margin-bottom:15px;">
+        <input id="teamName" placeholder="Nom" class="input" />
+        <input id="teamRole" placeholder="Rôle" class="input" />
+        <button id="addTeamBtn" class="btn-primary">Ajouter</button>
+        <button id="resetBtn" class="btn-secondary" style="display:none; color: #ffffff; background-color: red; padding: 13px; font-weight: bold; border-color: #000000;">
+          Réinitialiser
+        </button>
+      </div>
+      <table class="table" id="teamTable">
+        <thead>
+          <tr><th>Nom</th><th>Rôle</th><th>Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          /* KPI */
+          const resStats = await fetch("/api/stats", {
+            credentials: "include"
+          });
+          const stats = await resStats.json();
+          document.getElementById("kpiProjects").textContent = stats.projects;
+      
+          /* Graph données */
+          const resGraph = await fetch("/api/graphe", {
+            credentials: "include"
+          });
+          const graph = await resGraph.json();
+
+          document.getElementById("kpiLeads").textContent = graph.leads;
+      
+          const ctx = document.getElementById("adminChart").getContext("2d");
+          if (window.myChart) window.myChart.destroy();
+      
+          window.myChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: ["Devis", "Clients", "Projets", "Services", "Rappels"],
+              datasets: [{
+                label: "Nombre",
+                data: [
+                  graph.devis,
+                  graph.leads,
+                  graph.projects,
+                  graph.services,
+                  graph.callbacks
+                ],
+                backgroundColor: ["#f59e0b", "#10b981", "#3b82f6", "#6366f1", "#ef4444"]
+              }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false }} }
+          });
+      
+        } catch (err) {
+          console.error("❌ Erreur Dashboard:", err);
+          alert("Session expirée. Veuillez vous reconnecter.");
+          localStorage.removeItem("authToken");
+          sessionStorage.removeItem("authToken");
+          window.location.href = "login.html";
+        }
+      });
+    </script>
+    
+    <style>
+      #previewImages {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .img-container {
+        position: relative;
+        width: 110px;
+        height: 80px;
+      }
+      .img-container img {
+        width: 100%;
+        height: 100%;
+        border-radius: 6px;
+        object-fit: cover;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      }
+      .delete-btn {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: red;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 18px;
+        text-align: center;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      }
+      .delete-btn:hover {
+        background: darkred;
+      }
+
+      .input {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-right: 6px;
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .table th, .table td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+      }
+      .action-btn {
+        padding: 4px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-right: 6px;
+      }
+      .edit-btn { background:#3b82f6; color:white; }
+      .del-btn { background:#ef4444; color:white; }
+      #resetBtn {
+        margin-left: 10px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid #bbb;
+        cursor: pointer;
+      }
+      #resetBtn:hover {
+        background: #eee;
+      }
+    </style>
+    
+    <script>
+      // === Gestion du compteur de projets (simple) ===
+      const countInput = document.getElementById('adminProjectCount');
+    
+      // Charger la valeur actuelle
+      fetch("/api/stats", {
+        credentials: "include"
+      })
+      .then(r => r.json())
+      .then(stats => { countInput.value = stats.projects; });
+    
+      document.getElementById('saveCountBtn').addEventListener('click', async () => {
+        await fetch("/api/stats", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projects: countInput.value })
+      });
+        alert("✅ Nombre de projets mis à jour avec succès !");
+      });
+    
+      // === Gestion des images ===
+      const uploader = document.getElementById('imageUploader');
+      const preview = document.getElementById('previewImages');
+      let stored = JSON.parse(localStorage.getItem('projectImages')) || [];
+    
+      function renderPreview() {
+        preview.innerHTML = '';
+        stored.forEach((src, index) => {
+          const container = document.createElement('div');
+          container.className = 'img-container';
+    
+          const img = document.createElement('img');
+          img.src = src;
+    
+          const btn = document.createElement('button');
+          btn.className = 'delete-btn';
+          btn.innerHTML = '×';
+    
+          btn.onclick = async () => {
+            const filename = src.split("/").pop();
+
+            await fetch(`/api/uploads/project-images/${filename}`, {
+              method: "DELETE"
+            });
+    
+            stored.splice(index, 1);
+            localStorage.setItem("projectImages", JSON.stringify(stored));
+            renderPreview();
+          };
+    
+          container.appendChild(img);
+          container.appendChild(btn);
+          preview.appendChild(container);
+        });
+      }
+      renderPreview();
+    
+      uploader.addEventListener('change', async (e) => {
+        const form = new FormData();
+        [...e.target.files].forEach(file => form.append("images", file));
+    
+        const res = await fetch("/api/uploads/project-images", {
+          method: "POST",
+          body: form  
+        });
+    
+        const data = await res.json();
+        if (!data.success) return alert("❌Erreur upload");
+    
+        stored = stored.concat(data.files.map(f => f.url));
+        localStorage.setItem("projectImages", JSON.stringify(stored));
+        renderPreview();
+        e.target.value = "";
+      });
+    </script>
+
+    <script>
+      let editId = null;  // 🟦 Identifie si on modifie un membre ou non
+
+      /* ============================
+          🔹 Charger les membres
+        ============================ */
+      async function loadTeam() {
+        const res = await fetch("/api/team", { credentials: "include" });
+        const team = await res.json();
+
+        const tbody = document.querySelector("#teamTable tbody");
+        tbody.innerHTML = team.map(m => `
+          <tr>
+            <td>${m.name}</td>
+            <td>${m.role}</td>
+            <td>
+              <button class="action-btn edit-btn" onclick="startEdit('${m.id}', '${m.name}', '${m.role}')">Modifier</button>
+              <button class="action-btn del-btn" onclick="deleteMember('${m.id}')">Supprimer</button>
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      /* ============================
+          🔹 Démarrer mode modification
+        ============================ */
+      function startEdit(id, name, role) {
+        editId = id;
+
+        document.getElementById("teamName").value = name;
+        document.getElementById("teamRole").value = role;
+
+        const addBtn = document.getElementById("addTeamBtn");
+        addBtn.textContent = "Enregistrer";            // Change le bouton
+        addBtn.style.background = "green";       
+
+        document.getElementById("resetBtn").style.display = "inline-block"; // montre bouton reset
+      }
+
+      /* ============================
+          🔹 Réinitialiser le formulaire
+        ============================ */
+      function resetForm() {
+        editId = null;
+        document.getElementById("teamName").value = "";
+        document.getElementById("teamRole").value = "";
+
+        const addBtn = document.getElementById("addTeamBtn");
+        addBtn.textContent = "Ajouter";
+        addBtn.style.background = "";   // couleur normal bouton
+
+        document.getElementById("resetBtn").style.display = "none";
+      }
+
+      document.getElementById("resetBtn").onclick = resetForm;
+
+      /* ============================
+          🔹 Ajouter ou Enregistrer
+        ============================ */
+      document.getElementById("addTeamBtn").onclick = async () => {
+        const nameInput = document.getElementById("teamName");
+        const roleInput = document.getElementById("teamRole");
+
+        const name = nameInput.value.trim();
+        const role = roleInput.value.trim();
+
+        if (!name || !role) return alert("Veuillez remplir les champs.");
+
+        /* 🟩 MODE MODIFICATION */
+        if (editId) {
+          await fetch(`/api/team/${editId}`, {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, role })
+          });
+
+          alert("✅ Membre mis à jour avec succès !");
+          resetForm();
+          loadTeam();
+          return;
+        }
+
+        /* 🟩 MODE AJOUT */
+        await fetch("/api/team", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, role })
+        });
+
+        nameInput.value = "";
+        roleInput.value = "";
+
+        loadTeam();
+      };
+
+      /* ============================
+          🔹 Supprimer un membre
+        ============================ */
+      async function deleteMember(id) {
+        if (!confirm("Voulez-vous vraiment supprimer ce membre ?")) return;
+
+        await fetch(`/api/team/${id}`, {
+          method: "DELETE",
+          credentials: "include"
+        });
+        alert("✅ Membre supprimé avec succès !");
+        loadTeam();
+      }
+
+      /* Charger la liste au démarrage */
+      loadTeam();
+    </script>
+  </main>
+  <!-- ========== Admin Footer ========== -->
+  <footer class="admin-footer" role="contentinfo" aria-label="Pied de page administration">
+    <div class="admin-footer-inner">
+      <div class="admin-left">
+        <div class="admin-brand">
+          <img src="../images/COR'BAT.png" alt="COR'BAT" />
+          <div>
+            <strong>Admin COR'BAT</strong>
+            <div class="small muted">Espace administrateur</div>
+          </div>
+        </div>
+
+        <div class="admin-contact dev-credit">
+          <div>Développé par : <strong>Kenny R.</strong></div>
+          <div>Tél : <a href="tel:+261331916764">+261 33 19 167 64</a></div>
+          <div>Email : <a href="mailto:ramarielina2604@gmail.com">ramarielina2604@gmail.com</a></div>
+        </div>      
+      </div>
+
+      <div class="admin-right">
+        <nav class="admin-links" aria-label="Liens utilitaires admin">
+          <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+          <a href="devis.html" class="nav-link">Devis</a>
+          <a href="leads.html" class="nav-link">Clients</a>
+          <a href="projects.html" class="nav-link">Projets</a>
+          <a href="services.html" class="nav-link">Services</a>
+          <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+        </nav>
+      </div>
+    </div>
+
+    <div class="admin-footer-bottom">
+      <small>© <span id="adminYear"></span> COR'BAT — Espace Admin • Tous droits réservés.</small>
+    </div>
+  </footer>
+  <!-- ====== Styles pour admin-footer ====== -->
+  <style>
+    .admin-footer {
+      background:#070707;
+      color:#e6e6e6;
+      padding:18px 24px;
+      border-top:1px solid rgba(255,255,255,0.04);
+      font-family: 'Poppins', sans-serif;
+      margin-top:32px;
+    }
+    .admin-footer-inner {
+      display:flex;
+      gap:20px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .admin-left { display:flex; gap:14px; align-items:center; min-width:200px; }
+    .admin-brand img { width:44px; height:44px; object-fit:contain; border-radius:8px; }
+    .admin-brand strong { display:block; color:#fff; }
+    .small { font-size:0.87rem; }
+    .muted { color:#a9a9a9; }
+    .admin-center { flex:1; display:flex; justify-content:center; }
+    .kpis { display:flex; gap:22px; align-items:center; }
+    .kpi { text-align:center; min-width:88px; }
+    .kpi-value { font-weight:700; font-size:1.25rem; color:linear-gradient(90deg,#ffb400,#ff6b6b); }
+    .kpi-label { font-size:0.85rem; color:#bdbdbd; }
+    .admin-right { display:flex; gap:14px; align-items:center; min-width:220px; justify-content:flex-end; }
+    .admin-links { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .admin-links a { color:#dfe6ef; text-decoration:none; font-size:0.95rem; padding:6px 8px; border-radius:6px; }
+    .admin-links a:hover { background:rgba(255,255,255,0.02); color:#fff; }
+    .admin-actions { display:flex; gap:8px; align-items:center; }
+    .btn-ghost.small { padding:6px 10px; background:transparent; color:#ccc; border:1px solid rgba(255,255,255,0.03); border-radius:8px; cursor:pointer; }
+    .btn-logout { background:#ef4444; color:#ffffff; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
+    .btn-ghost {background:red;color:#ffffff;padding:12px 18px;border-radius:8px;font-weight:700}
+    .admin-footer-bottom { text-align:center; margin-top:12px; color:#9a9a9a; font-size:0.88rem; border-top:1px solid rgba(255,255,255,0.02); padding-top:10px; }
+    .dev-credit {
+      position: fixed;
+      bottom: 10px;
+      right: 14px;
+      font-size: 0.68rem;
+      opacity: 0.25;
+      color: #ffffff; /* si fond clair → change en #555 */
+      line-height: 1.25;
+      text-align: right;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 9999;
+    }
+    .dev-credit a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .dev-credit:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    /* Responsive */
+    @media (max-width:880px){
+      .admin-footer-inner { flex-direction:column; align-items:stretch; gap:12px; }
+      .admin-center { order:3; justify-content:space-between; }
+      .admin-right { justify-content:space-between; }
+    }
+  </style>
+
+  <script>
+    (function(){
+      // Mise à jour de l'année footer
+      document.getElementById('adminYear').textContent = new Date().getFullYear();
+    
+      // Déconnexion via backend (efface cookie)
+      const btnLogout = document.getElementById('btnLogout');
+      if (btnLogout) {
+        btnLogout.addEventListener('click', async function(){
+          if(!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
+    
+          await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include"
+          });
+    
+          // Nettoyage des ancien restes locaux (optionnel mais propre)
+          localStorage.removeItem('btp_admin_logged');
+          localStorage.removeItem('btp_admin_token');
+          sessionStorage.removeItem('btp_admin_logged');
+          sessionStorage.removeItem('btp_admin_token');
+    
+          window.location.href = "login.html";
+        });
+      }
+    
+      // Bouton vider cache (ne touche pas l’auth)
+      const btnClearCache = document.getElementById('btnClearCache');
+      if (btnClearCache){
+        btnClearCache.addEventListener('click', function(){
+          if(!confirm('Vider les données d’images ?')) return;
+          localStorage.removeItem('projectImages');
+          alert('Cache images supprimé.');
+          document.dispatchEvent(new Event('projectImagesCleared'));
+        });
+      }
+    
+    })();
+  </script>
+  <!-- ===== MODALE Changer Mot de Passe ===== -->
+  <div id="changePassModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>Changer le mot de passe</h3>
+      <label>Ancien mot de passe :</label>
+      <input type="password" id="oldPass">
+
+      <label>Nouveau mot de passe :</label>
+      <input type="password" id="newPass">
+
+      <label>Confirmer le nouveau mot de passe :</label>
+      <input type="password" id="confirmPass">
+
+      <div class="modal-actions">
+        <button id="savePassBtn" class="btn-primary">Enregistrer</button>
+        <button id="closePassModal" class="btn-ghost">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+  .modal {position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:99999}
+  .modal-content {background:#fff;padding:22px;border-radius:10px;max-width:380px;width:100%;box-shadow:0 12px 30px rgba(0,0,0,0.25)}
+  .modal-content input {width:100%;margin-bottom:12px;padding:8px;border-radius:6px;border:1px solid #ccc;}
+  .modal-actions {display:flex;justify-content:flex-end;gap:8px;}
+  </style>
+
+  <script>
+    const modal = document.getElementById('changePassModal');
+    document.getElementById('btnChangePass').onclick = () => modal.style.display = 'flex';
+    document.getElementById('closePassModal').onclick = () => modal.style.display = 'none';
+    
+    document.getElementById('savePassBtn').onclick = async () => {
+      const oldPass = document.getElementById('oldPass').value.trim();
+      const newPass = document.getElementById('newPass').value.trim();
+      const confirm = document.getElementById('confirmPass').value.trim();
+    
+      if (!oldPass || !newPass || !confirm)
+        return alert("Veuillez remplir tous les champs.");
+    
+      if (newPass !== confirm)
+        return alert("❌Les nouveaux mots de passe ne correspondent pas. Veuillez recommencer");
+    
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ oldPass, newPass })
+      });
+    
+      const data = await res.json();
+      if (!data.success) return alert(data.error);
+      alert("✅ Mot de passe mis à jour avec succès !");
+      modal.style.display = 'none';
+    };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "site-web-btp",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.4.1",
+    "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.10",
+    "pdfkit": "^0.17.2",
+    "sqlite3": "^5.1.7",
+    "uuid": "^8.3.2"
+  }
+}

@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" /> 
+  <title>Gestion des services — COR'BAT</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    /* Styles spécifiques à l'admin services (compact) */
+    body { font-family: 'Poppins',sans-serif; background: #f6f7fb; color:#111;}
+    .container { max-width:1100px; margin:0 auto; }
+    .card { background:#fff; padding:18px; border-radius:12px; box-shadow:0 6px 18px rgba(12,12,20,0.06); margin-bottom:18px; }
+    .grid { display:grid; grid-template-columns: 1fr 380px; gap:18px; align-items:start; }
+    label { display:block; font-weight:600; margin-bottom:6px; font-size:0.95rem; }
+    input[type="text"], input[type="number"], textarea, select { width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6e9ef; box-sizing:border-box; }
+    textarea { min-height:100px; resize:vertical; }
+    .btn { padding:10px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
+    .btn-primary { background:green; color:#ffffff; }
+    .btn-modraf { background: rgb(0, 225, 255); color:#000000; }
+    .btn-ghost { background:red; border:1px solid #ddd; color:#ffffff; }
+    .services-list { display:flex; flex-direction:column; gap:10px; }
+    .svc-row { display:flex; gap:12px; align-items:center; padding:10px; border-radius:10px; border:1px solid #f0f2f5; background:#fff; }
+    .svc-thumb { width:84px; height:64px; border-radius:8px; object-fit:cover; background:#f2f2f2; flex:0 0 84px; }
+    .svc-body { flex:1; }
+    .svc-title { font-weight:700; margin:0 0 6px 0; }
+    .svc-desc { margin:0; color:#555; font-size:0.95rem; }
+    .svc-actions { display:flex; gap:8px; align-items:center; }
+    .search { padding:10px 12px; border-radius:8px; border:1px solid #e6e9ef; width:100%; box-sizing:border-box; }
+    .small-muted { color:#6b7280; font-size:0.9rem; }
+    .img-preview { width:100%; height:160px; object-fit:cover; border-radius:10px; border:1px solid #eaeaea; }
+    .help { font-size:0.9rem; color:#6b7280; margin-top:6px; }
+    @media (max-width:980px){ .grid{ grid-template-columns: 1fr; } .svc-row{ flex-direction:row; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">
+        <img src="../images/COR'BAT.png" alt="COR'BAT">
+      </span>
+      <span class="brand-name">Admin COR'BAT</span>
+    </div>
+    <!-- ======== NAVIGATION ======== -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+      <a href="devis.html" class="nav-link">Liste devis</a>
+      <a href="leads.html" class="nav-link">Clients intéressés</a>
+      <a href="projects.html" class="nav-link">Projets récents</a>
+      <a href="services.html" class="nav-link">Nos services</a>
+      <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+      <div class="admin-actions">
+        <button id="btnLogout" class="btn-logout">Se déconnecter</button>
+      </div>
+    </nav>
+  </header>
+  <!-- ======== STYLES (consolidés) ======== -->
+  <style>
+    /* === Header moderne === */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 40px;
+      background: linear-gradient(90deg,#000 0%, #000 100%);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+    /* Brand (logo + texte) */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .brand .logo img {
+      width: 48px;
+      height: auto;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .brand .brand-name {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      background: #ffffff;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand img { width:50px; height:auto; }
+    /* Nav alignée à droite */
+    .nav {
+      display: flex;
+      gap: 28px;
+      margin-left: auto; /* pousse le menu vers la droite */
+      align-items: center;
+    }
+    .nav-link {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      position: relative;
+      font-size: 1rem;
+      transition: color 0.25s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -6px;
+      left: 0;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      transition: width 0.25s ease;
+    }
+    .nav-link:hover {
+      color: #ffb400;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    /* Bouton Demander un devis */
+    .btn-devis {
+      padding: 8px 16px;
+      border-radius: 22px;
+      background: linear-gradient(90deg,#ffb400,#ff6b6b);
+      color: #111;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(255,107,107,0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-devis:hover {
+      transform: translateY(-2px);
+    }
+    /* Menu toggle (mobile) */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      margin-left: 12px;
+    }
+    .menu-toggle span {
+      width: 26px;
+      height: 3px;
+      background: #fff;
+      border-radius: 3px;
+    }
+    /* === Responsive === */
+    @media (max-width: 1024px) {
+      .nav {
+        display: none;
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        background: #000;
+        flex-direction: column;
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        gap: 12px;
+        min-width: 200px;
+      }
+      .nav.active { display: flex; }
+      .menu-toggle { display: flex; }
+      .brand .brand-name { font-size: 1.1rem; }
+    }
+  </style>
+
+  <main class="container">
+    <div class="card">
+      <h2>Gestion des services</h2>
+      <p class="small-muted">Ajouter, modifier et supprimer les services que les clients pourront voir.</p>
+    </div>
+
+    <div class="grid">
+      <!-- Left: Liste & recherche -->
+      <div class="card">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+          <input id="searchInput" class="search" placeholder="Rechercher par titre / description..." />
+          <button id="refreshBtn" class="btn btn-modraf" title="Rafraîchir">Rafraîchir</button>
+        </div>
+
+        <div id="servicesList" class="services-list" aria-live="polite">
+          <!-- lignes injectées ici -->
+        </div>
+
+        <div style="margin-top:12px;">
+          <button id="clearAllBtn" class="btn btn-ghost">Supprimer tous les services</button>
+        </div>
+      </div>
+
+      <!-- Right: Formulaire d'ajout / edition -->
+      <aside class="card">
+        <h3 id="formTitle">Ajouter un service</h3>
+
+        <form id="serviceForm">
+          <input type="hidden" id="svcId" />
+
+          <div style="margin-bottom:10px;">
+            <label for="svcTitle">Titre</label>
+            <input id="svcTitle" name="title" type="text" required placeholder="Ex : Peinture" />
+          </div>
+
+          <div style="margin-bottom:10px;">
+            <label for="svcShort">Sous-titre court (1 ligne)</label>
+            <input id="svcShort" name="short" type="text" placeholder="Phrase courte" />
+          </div>
+
+          <div style="margin-bottom:10px;">
+            <label for="svcDesc">Description détaillée</label>
+            <textarea id="svcDesc" name="description" placeholder="Détail du service..."></textarea>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <div style="flex:1">
+              <label for="svcPrice">Étiquette / Prix (facultatif)</label>
+              <input id="svcPrice" name="price" type="text" placeholder="Ex : 120 000 Ar"/>
+            </div>
+            <div style="flex:1">
+              <label for="svcOrder">Ordre (tri)</label>
+              <input id="svcOrder" name="order" type="number" placeholder="Ex : 10" />
+            </div>
+          </div>
+
+          <div style="margin-bottom:10px;">
+            <label>Image (URL ou fichier)</label>
+            <input id="svcImageUrl" type="text" placeholder="Ex: https:// (laisser si vous voulez importer une image)"/>
+            <div class="help">ou importer une image (max 2 Mo)</div>
+            <input id="svcFile" type="file" accept="image/*" style="margin-top:8px;"/>
+            <img id="svcPreview" class="img-preview" alt="Aperçu image" style="display:none;margin-top:10px;"/>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button id="saveBtn" class="btn btn-primary" type="submit">Enregistrer</button>
+            <button id="resetBtn" type="button" class="btn btn-ghost">Réinitialiser</button>
+        </div>
+        </form>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    (async function(){
+      const API_URL = "/api/services";
+      const UPLOAD_URL = "/api/uploads-services";
+    
+      const el = (id) => document.getElementById(id);
+      const list = el("servicesList");
+    
+      // Récupérer tous les services depuis le backend ===
+      async function fetchServices() {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error("❌ Erreur récupération services");
+        return res.json();
+      }
+    
+      // Afficher les services ===
+      async function render(filter = "") {
+        const data = await fetchServices();
+        const q = (filter || "").toLowerCase().trim();
+    
+        const filtered = data
+          .sort((a, b) => (a.order_index || 0) - (b.order_index || 0))
+          .filter(s =>
+            !q ||
+            (s.title && s.title.toLowerCase().includes(q)) ||
+            (s.short && s.short.toLowerCase().includes(q)) ||
+            (s.description && s.description.toLowerCase().includes(q))
+          );
+    
+        if (!filtered.length) {
+          list.innerHTML = "<div class='small-muted' style='padding:12px'>Aucun service trouvé.</div>";
+          return;
+        }
+    
+        list.innerHTML = filtered.map(s => `
+          <div class="svc-row" data-id="${s.id}">
+            <img class="svc-thumb" src="${s.image || '../images/logoCorbAt.png'}" alt="${s.title || 'Service'}">
+            <div class="svc-body">
+              <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+                <div style="flex:1">
+                  <div class="svc-title">${s.title || ''} 
+                    <span style="font-weight:600;color:#6b7280;font-size:0.9rem;margin-left:8px">${s.price || ''}</span>
+                  </div>
+                  <div class="svc-desc">${s.short || s.description || ''}</div>
+                </div>
+                <div class="svc-actions">
+                  <button class="btn btn-modraf edit-btn" data-id="${s.id}">Modifier</button>
+                  <button class="btn btn-ghost del-btn" data-id="${s.id}">Supprimer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join("");
+    
+        // Bind actions
+        list.querySelectorAll(".edit-btn").forEach(b => b.addEventListener("click", () => loadEdit(b.dataset.id)));
+        list.querySelectorAll(".del-btn").forEach(b => b.addEventListener("click", () => removeService(b.dataset.id)));
+      }
+    
+      // Charger un service dans le formulaire pour modification ===
+      async function loadEdit(id) {
+        const services = await fetchServices();
+        const s = services.find(x => x.id === id);
+        if (!s) return alert("❌ Service introuvable");
+    
+        el("svcId").value = s.id;
+        el("svcTitle").value = s.title || "";
+        el("svcShort").value = s.short || "";
+        el("svcDesc").value = s.description || "";
+        el("svcPrice").value = s.price || "";
+        el("svcOrder").value = s.order_index || 0;
+        el("svcImageUrl").value = s.image || "";
+        el("svcPreview").src = s.image || "";
+        el("svcPreview").style.display = s.image ? "block" : "none";
+        el("formTitle").textContent = "Modifier le service";
+        window.scrollTo({top:0,behavior:"smooth"});
+      }
+    
+      // Supprimer un service ===
+      async function removeService(id) {
+        if (!confirm("Voulez-vous vraiment supprimer ce service ?")) return;
+        const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        if (!res.ok) return alert("❌ Erreur lors de la suppression !");
+        alert("✅ Service supprimé avec succès !");
+        render();
+      }
+    
+      // Ajouter ou modifier un service ===
+      el("serviceForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+    
+        const id = el("svcId").value;
+        const service = {
+          title: el("svcTitle").value.trim(),
+          short: el("svcShort").value.trim(),
+          description: el("svcDesc").value.trim(),
+          price: el("svcPrice").value.trim(),
+          order_index: Number(el("svcOrder").value) || 0,
+          image: el("svcImageUrl").value.trim() || ""
+        };
+    
+        if (!service.title) return alert("Le titre est requis.");
+    
+        const method = id ? "PATCH" : "POST";
+        const url = id ? `${API_URL}/${id}` : API_URL;
+    
+        const res = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(service)
+        });
+    
+        if (!res.ok) return alert("❌ Erreur lors de l'enregistrement !");
+        alert(id ? "✅ Service modifié avec succès  !" : "✅ Service ajouté avec succès  !");
+        
+        e.target.reset();
+        el("svcId").value = "";
+        el("svcPreview").style.display = "none";
+        el("formTitle").textContent = "Ajouter un service";
+        render();
+      });
+    
+      // Gestion du fichier image ===
+      el("svcFile").addEventListener("change", async function() {
+        const file = this.files[0];
+        if (!file) return;
+    
+        const formData = new FormData();
+        formData.append("images", file);
+    
+        try {
+          const res = await fetch(UPLOAD_URL, { method: "POST", body: formData });
+          if (!res.ok) throw new Error("❌ Erreur upload image");
+          const data = await res.json();
+    
+          if (data.files && data.files.length > 0) {
+            const uploaded = data.files[0];
+            const imageUrl = uploaded.url.startsWith("http")
+              ? uploaded.url
+              : `${uploaded.url}`;
+    
+            el("svcImageUrl").value = imageUrl;
+            el("svcPreview").src = imageUrl;
+            el("svcPreview").style.display = "block";
+          }
+        } catch (err) {
+          console.error("❌ Erreur upload:", err);
+          alert("❌ Erreur lors du téléversement de l'image.");
+        }
+      });
+    
+      // Réinitialiser le formulaire ===
+      el("resetBtn").addEventListener("click", () => {
+        el("serviceForm").reset();
+        el("svcId").value = "";
+        el("svcPreview").style.display = "none";
+        el("formTitle").textContent = "Ajouter un service";
+      });
+    
+      // Recherche dynamique ===
+      el("searchInput").addEventListener("input", (e) => render(e.target.value));
+    
+      // Rafraîchir ===
+      el("refreshBtn").addEventListener("click", render);
+    
+      // Supprimer tous les services ===
+      el("clearAllBtn").addEventListener("click", async () => {
+        if (!confirm("Voulez-vous vraiment supprimer tous les services ?")) return;
+        const all = await fetchServices();
+        for (const s of all) {
+          await fetch(`${API_URL}/${s.id}`, { method: "DELETE" });
+        }
+        alert("✅ Tous les services ont été supprimés avec succès !");
+        render();
+      });
+    
+      // Initialisation
+      render();
+    })();
+  </script>
+  <!-- ========== Admin Footer ========== -->
+  <footer class="admin-footer" role="contentinfo" aria-label="Pied de page administration">
+    <div class="admin-footer-inner">
+      <div class="admin-left">
+        <div class="admin-brand">
+          <img src="../images/COR'BAT.png" alt="COR'BAT" />
+          <div>
+            <strong>Admin COR'BAT</strong>
+            <div class="small muted">Espace administrateur</div>
+          </div>
+        </div>
+  
+        <div class="admin-contact dev-credit">
+          <div>Développé par : <strong>Kenny R.</strong></div>
+          <div>Tél : <a href="tel:+261331916764">+261 33 19 167 64</a></div>
+          <div>Email : <a href="mailto:ramarielina2604@gmail.com">ramarielina2604@gmail.com</a></div>
+        </div>      
+      </div>
+  
+      <div class="admin-right">
+        <nav class="admin-links" aria-label="Liens utilitaires admin">
+          <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+          <a href="devis.html" class="nav-link">Devis</a>
+          <a href="leads.html" class="nav-link">Clients</a>
+          <a href="projects.html" class="nav-link">Projets</a>
+          <a href="services.html" class="nav-link">Services</a>
+          <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+        </nav>
+      </div>
+    </div>
+  
+    <div class="admin-footer-bottom">
+      <small>© <span id="adminYear"></span> COR'BAT — Espace Admin • Tous droits réservés.</small>
+    </div>
+  </footer>
+  <!-- ====== Styles pour admin-footer ====== -->
+  <style>
+    .admin-footer {
+      background:#070707;
+      color:#e6e6e6;
+      padding:18px 24px;
+      border-top:1px solid rgba(255,255,255,0.04);
+      font-family: 'Poppins', sans-serif;
+      margin-top:32px;
+    }
+    .admin-footer-inner {
+      display:flex;
+      gap:20px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .admin-left { display:flex; gap:14px; align-items:center; min-width:200px; }
+    .admin-brand img { width:44px; height:44px; object-fit:contain; border-radius:8px; }
+    .admin-brand strong { display:block; color:#fff; }
+    .small { font-size:0.87rem; }
+    .muted { color:#a9a9a9; }
+    .admin-center { flex:1; display:flex; justify-content:center; }
+    .kpis { display:flex; gap:22px; align-items:center; }
+    .kpi { text-align:center; min-width:88px; }
+    .kpi-value { font-weight:700; font-size:1.25rem; color:linear-gradient(90deg,#ffb400,#ff6b6b); }
+    .kpi-label { font-size:0.85rem; color:#bdbdbd; }
+    .admin-right { display:flex; gap:14px; align-items:center; min-width:220px; justify-content:flex-end; }
+    .admin-links { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .admin-links a { color:#dfe6ef; text-decoration:none; font-size:0.95rem; padding:6px 8px; border-radius:6px; }
+    .admin-links a:hover { background:rgba(255,255,255,0.02); color:#fff; }
+    .admin-actions { display:flex; gap:8px; align-items:center; }
+    .btn-ghost.small { padding:6px 10px; background:transparent; color:#ccc; border:1px solid rgba(255,255,255,0.03); border-radius:8px; cursor:pointer; }
+    .btn-logout { background:#ef4444; color:#ffffff; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
+    .admin-footer-bottom { text-align:center; margin-top:12px; color:#9a9a9a; font-size:0.88rem; border-top:1px solid rgba(255,255,255,0.02); padding-top:10px; }
+    .dev-credit {
+      position: fixed;
+      bottom: 10px;
+      right: 14px;
+      font-size: 0.68rem;
+      opacity: 0.25;
+      color: #ffffff; /* si fond clair → change en #555 */
+      line-height: 1.25;
+      text-align: right;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 9999;
+    }
+    .dev-credit a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .dev-credit:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    /* Responsive */
+    @media (max-width:880px){
+      .admin-footer-inner { flex-direction:column; align-items:stretch; gap:12px; }
+      .admin-center { order:3; justify-content:space-between; }
+      .admin-right { justify-content:space-between; }
+    }
+  </style>
+  
+  <script>
+    (function(){
+      // Mise à jour de l'année footer
+      document.getElementById('adminYear').textContent = new Date().getFullYear();
+    
+      // Déconnexion via backend (efface cookie)
+      const btnLogout = document.getElementById('btnLogout');
+      if (btnLogout) {
+        btnLogout.addEventListener('click', async function(){
+          if(!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
+    
+          await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include"
+          });
+    
+          // Nettoyage des ancien restes locaux (optionnel mais propre)
+          localStorage.removeItem('btp_admin_logged');
+          localStorage.removeItem('btp_admin_token');
+          sessionStorage.removeItem('btp_admin_logged');
+          sessionStorage.removeItem('btp_admin_token');
+    
+          window.location.href = "login.html";
+        });
+      }
+    
+      // Bouton vider cache (ne touche pas l’auth)
+      const btnClearCache = document.getElementById('btnClearCache');
+      if (btnClearCache){
+        btnClearCache.addEventListener('click', function(){
+          if(!confirm('Vider les données d’images ?')) return;
+          localStorage.removeItem('projectImages');
+          alert('Cache images supprimé.');
+          document.dispatchEvent(new Event('projectImagesCleared'));
+        });
+      }
+    
+    })();
+  </script>
+</body>
+</html>

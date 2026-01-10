@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Devis — COR'BAT</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <style>
+    :root {
+      --accent1:#ffb400;
+      --accent2:#ff6b6b;
+      --bg-dark:#000000;
+      --card-bg:#000000;
+      --text:#000000;
+      --muted:#bfc7d1;
+      --radius:12px;
+      font-family:'Poppins',sans-serif;
+    }
+    body {
+      margin:0; padding:0;
+      background:#ffffff;
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    /* ===== HEADER ===== */
+    .topbar {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:18px 40px;
+      background:#000;
+      color:#fff;
+      box-shadow:0 5px 25px rgba(0,0,0,0.2);
+      position:sticky;
+      top:0;
+      z-index:1000;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .brand .logo img {
+      width: 48px;
+      height: auto;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .brand .brand-name {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      background: #ffffff;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand img { width:50px; height:auto; }
+    .nav {
+      display:flex;
+      gap:26px;
+      align-items:center;
+    }
+    .nav-link {
+      color:#fff;
+      text-decoration:none;
+      position:relative;
+      transition:color .3s;
+      font-weight:500;
+    }
+    .nav-link::after {
+      content:"";
+      position:absolute;
+      bottom:-5px;
+      left:0;
+      width:0%;
+      height:2px;
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));
+      transition:width .3s;
+    }
+    .nav-link:hover {
+      color:var(--accent1);
+    }
+    .nav-link:hover::after {
+      width:100%;
+    }
+    .btn-logout {
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));
+      color:#111;
+      font-weight:700;
+      padding:8px 14px;
+      border:0;
+      border-radius:8px;
+      cursor:pointer;
+      box-shadow:0 4px 10px rgba(255,107,107,0.3);
+      transition:transform .2s;
+    }
+    /* ===== MAIN ===== */
+    .container {
+      max-width:1200px;
+      margin:40px auto;
+    }
+    h1 {
+      background: #000000;
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      font-size:1.8rem;
+      margin-bottom:20px;
+      text-align:center;
+      animation: fadeIn 0.8s ease;
+    }
+    .card {
+      background:var(--card-bg);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.4);
+      border:1px solid rgba(255,255,255,0.05);
+      animation: fadeInUp 0.8s ease;
+    }
+    .toolbar {
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .search, .filter, .btn {
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:#ffffff;
+      color:#000000;
+      font-size:0.95rem;
+    }
+    .btn {
+      cursor:pointer;
+      font-weight:600;
+      transition:background .3s,transform .2s;
+    }
+    .btn-primary {
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));
+      color:#111;
+    }
+    .btn-ghost:hover {
+      background:rgba(255,255,255,0.1);
+      transform:translateY(-1px);
+    }
+    .btn-ex {
+      background:rgb(0, 225, 255);
+      color:#000000;
+    }
+    table {
+      width:100%;
+      border-collapse:collapse;
+      font-size:0.95rem;
+      color:#ddd;
+      animation: fadeIn 0.8s ease;
+    }
+    thead th {
+      text-align:left;
+      padding:12px;
+      background:rgba(255,255,255,0.05);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+
+    tbody td {
+      padding:12px;
+      border-bottom:1px solid rgba(255,255,255,0.03);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    /* ✨ Survol lumineux des lignes */
+    tbody tr:hover {
+      background:rgba(255,255,255,0.05);
+      box-shadow:0 0 8px rgba(255,180,0,0.3);
+      transform:scale(1.01);
+      transition: all 0.25s ease;
+    }
+    .status {
+      padding:5px 10px;
+      border-radius:8px;
+      font-weight:700;
+      font-size:0.85rem;
+      text-transform:capitalize;
+    }
+    .status.nouvelle { background:rgba(255,180,0,0.15); color:var(--accent1); }
+    .status.contactée { background:rgba(20,184,166,0.15); color:#10b981; }
+    .status.résolue { background:rgba(239,68,68,0.15); color:#ef4444; }
+    .actions button {
+      border:0;
+      border-radius:8px;
+      padding:6px 8px;
+      cursor:pointer;
+      font-weight:700;
+      margin-right:6px;
+    }
+    .actions .pdf {
+      background:rgba(255,255,255,0.1);
+      color:#fff;
+    }
+    .actions .danger {
+      background:red;
+      color:#ffffff;
+    }
+    /* ✨ Animation fade-in */
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity:0; transform:translateY(30px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    @media (max-width:768px) {
+      .topbar { flex-wrap:wrap; padding:14px 20px; }
+      .nav { flex-wrap:wrap; justify-content:center; gap:14px; margin-top:8px; }
+      .container { margin-top:20px; }
+      table { font-size:0.85rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ===== HEADER ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="../images/COR'BAT.png" alt="COR'BAT">
+      <span class="brand-name">Admin COR'BAT</span>
+    </div>
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+      <a href="devis.html" class="nav-link">Liste devis</a>
+      <a href="leads.html" class="nav-link">Clients intéressés</a>
+      <a href="projects.html" class="nav-link">Projets récents</a>
+      <a href="services.html" class="nav-link">Nos services</a>
+      <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+      <div class="admin-actions">
+        <button id="btnLogout" class="btn-logout">Se déconnecter</button>
+      </div>
+    </nav>
+  </header>
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="container">
+    <h1>Liste des demandes de devis</h1>
+    <div class="card">
+      <div class="toolbar">
+        <input id="q" class="search" placeholder="🔍 Rechercher..." />
+        <div class="filter-wrapper">
+          <label for="filterStatus" class="filter-label">Filtrer par statut :</label>
+          <select id="filterStatus" class="filter enhanced-select">
+            <option value="" class="value">Tous les statuts</option>
+            <option value="nouvelle" class="value">Nouvelle</option>
+            <option value="contactée" class="value">Contactée</option>
+            <option value="résolue" class="value">Résolue</option>
+          </select>
+        </div>              
+        <button id="exportCsv" class="btn btn-ex">Exporter CSV</button>
+        <button id="refreshBtn" class="btn btn-ex">Actualiser</button>
+      </div>
+
+      <div style="overflow:auto; max-height:64vh;">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th><th>Téléphone</th><th>Service</th>
+              <th>Email</th><th>Adresse</th><th>Surface</th><th>Date</th><th>Statut</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="devisTable">
+            <tr><td colspan="10" style="text-align:center;padding:20px;">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <!-- ========== Admin Footer ========== -->
+  <footer class="admin-footer" role="contentinfo" aria-label="Pied de page administration">
+    <div class="admin-footer-inner">
+      <div class="admin-left">
+        <div class="admin-brand">
+          <img src="../images/COR'BAT.png" alt="COR'BAT" />
+          <div>
+            <strong>Admin COR'BAT</strong>
+            <div class="small muted">Espace administrateur</div>
+          </div>
+        </div>
+  
+        <div class="admin-contact dev-credit">
+          <div>Développé par : <strong>Kenny R.</strong></div>
+          <div>Tél : <a href="tel:+261331916764">+261 33 19 167 64</a></div>
+          <div>Email : <a href="mailto:ramarielina2604@gmail.com">ramarielina2604@gmail.com</a></div>
+        </div>      
+      </div>
+  
+      <div class="admin-right">
+        <nav class="admin-links" aria-label="Liens utilitaires admin">
+          <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+          <a href="devis.html" class="nav-link">Devis</a>
+          <a href="leads.html" class="nav-link">Clients</a>
+          <a href="projects.html" class="nav-link">Projets</a>
+          <a href="services.html" class="nav-link">Services</a>
+          <a href="callbacks.html" class="nav-link">Demande de rappel</a>
+        </nav>
+      </div>
+    </div>
+  
+    <div class="admin-footer-bottom">
+      <small>© <span id="adminYear"></span> COR'BAT — Espace Admin • Tous droits réservés.</small>
+    </div>
+  </footer>
+  <!-- ====== Styles pour admin-footer ====== -->
+  <style>
+    .admin-footer {
+      background:#070707;
+      color:#e6e6e6;
+      padding:18px 24px;
+      border-top:1px solid rgba(255,255,255,0.04);
+      font-family: 'Poppins', sans-serif;
+      margin-top:32px;
+    }
+    .admin-footer-inner {
+      display:flex;
+      gap:20px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .admin-left { display:flex; gap:14px; align-items:center; min-width:200px; }
+    .admin-brand img { width:44px; height:44px; object-fit:contain; border-radius:8px; }
+    .admin-brand strong { display:block; color:#fff; }
+    .small { font-size:0.87rem; }
+    .muted { color:#a9a9a9; }
+    .admin-center { flex:1; display:flex; justify-content:center; }
+    .kpis { display:flex; gap:22px; align-items:center; }
+    .kpi { text-align:center; min-width:88px; }
+    .kpi-value { font-weight:700; font-size:1.25rem; color:linear-gradient(90deg,#ffb400,#ff6b6b); }
+    .kpi-label { font-size:0.85rem; color:#bdbdbd; }
+    .admin-right { display:flex; gap:14px; align-items:center; min-width:220px; justify-content:flex-end; }
+    .admin-links { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .admin-links a { color:#dfe6ef; text-decoration:none; font-size:0.95rem; padding:6px 8px; border-radius:6px; }
+    .admin-links a:hover { background:rgba(255,255,255,0.02); color:#fff; }
+    .admin-actions { display:flex; gap:8px; align-items:center; }
+    .btn-ghost.small { padding:6px 10px; background:transparent; color:#ccc; border:1px solid rgba(255,255,255,0.03); border-radius:8px; cursor:pointer; }
+    .btn-logout { background:#ef4444; color:#ffffff; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
+    .admin-footer-bottom { text-align:center; margin-top:12px; color:#9a9a9a; font-size:0.88rem; border-top:1px solid rgba(255,255,255,0.02); padding-top:10px; }
+    .dev-credit {
+      position: fixed;
+      bottom: 10px;
+      right: 14px;
+      font-size: 0.68rem;
+      opacity: 0.25;
+      color: #ffffff; /* si fond clair → change en #555 */
+      line-height: 1.25;
+      text-align: right;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 9999;
+    }
+    .dev-credit a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .dev-credit:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    /* Responsive */
+    @media (max-width:880px){
+      .admin-footer-inner { flex-direction:column; align-items:stretch; gap:12px; }
+      .admin-center { order:3; justify-content:space-between; }
+      .admin-right { justify-content:space-between; }
+    }
+  </style>
+  <!-- ===== SCRIPT ===== -->
+  <script>
+    const API_URL = "/api/quotes";
+
+    document.getElementById("adminYear").textContent = new Date().getFullYear();
+
+    // ✅ Correct logout (supprime cookie backend)
+    document.getElementById("btnLogout").addEventListener("click", async () => {
+      if (!confirm("Êtes-vous sûr de vouloir vous déconnecter ?")) return;
+
+      // Appel du backend pour enlever le cookie authToken
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include"
+      });
+
+      // Nettoyage optionnel des vieux tokens front (sécurité propre)
+      sessionStorage.removeItem('btp_admin_logged');
+      sessionStorage.removeItem('btp_admin_token');
+      localStorage.removeItem('btp_admin_logged');
+      localStorage.removeItem('btp_admin_token');
+
+      // Redirection
+      window.location.href = "login.html";
+    });
+        
+    (async function () {
+      const tableBody = document.getElementById("devisTable");
+      const q = document.getElementById("q");
+      const filterStatus = document.getElementById("filterStatus");
+    
+      // === 🔹 Récupération des devis ===
+      async function fetchQuotes() {
+        try {
+          const res = await fetch(API_URL);
+          if (!res.ok) throw new Error("❌ Erreur serveur");
+          return await res.json();
+        } catch (err) {
+          console.error(err);
+          alert("❌ Erreur de connexion au serveur.");
+          return [];
+        }
+      }
+    
+      function fmt(d) {
+        try {
+          return new Date(d).toLocaleString("fr-FR");
+        } catch (e) {
+          return d;
+        }
+      }
+      function safe(v) {
+        return v || "-";
+      }
+    
+      // === 🔹 Rendu du tableau ===
+      async function render() {
+        const quotes = await fetchQuotes();
+        let rows = quotes;
+        const search = q.value.toLowerCase().trim();
+        const statusF = filterStatus.value.toLowerCase().trim();
+    
+        if (statusF)
+          rows = rows.filter((r) => (r.status || "").toLowerCase() === statusF);
+        if (search)
+          rows = rows.filter((r) =>
+            ((r.fullname || "") + (r.email || "") + (r.service || ""))
+              .toLowerCase()
+              .includes(search)
+          );
+    
+        if (rows.length === 0) {
+          tableBody.innerHTML =
+            '<tr><td colspan="10" style="text-align:center;padding:20px;">Aucun devis trouvé.</td></tr>';
+          return;
+        }
+    
+        tableBody.innerHTML = rows
+          .map(
+            (r) => `
+          <tr style="animation:fadeIn 0.6s ease;">
+            <td>${safe(r.fullname)}</td>
+            <td>${safe(r.phone)}</td>
+            <td>${safe(r.service)}</td>
+            <td>${safe(r.email)}</td>
+            <td>${safe(r.address)}</td>
+            <td>${safe(r.surface)} m²</td>
+            <td>${fmt(r.created_at)}</td>
+            <td>
+              <select class="status-select" data-id="${r.id}">
+                <option value="nouvelle" ${r.status === "nouvelle" ? "selected" : ""}>Nouvelle</option>
+                <option value="contactée" ${r.status === "contactée" ? "selected" : ""}>Contactée</option>
+                <option value="résolue" ${r.status === "résolue" ? "selected" : ""}>Résolue</option>
+              </select>
+            </td>
+            <td class="actions">
+              <button class="danger" data-id="${r.id}">Supprimer</button>
+            </td>
+          </tr>`
+          )
+          .join("");
+    
+        // === ⚙️ Changement de statut ===
+        tableBody.querySelectorAll(".status-select").forEach((select) => {
+          select.addEventListener("change", async (e) => {
+            const id = e.target.dataset.id;
+            const newStatus = e.target.value;
+            e.target.disabled = true;
+    
+            try {
+              const res = await fetch(`${API_URL}/${id}/status`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus }),
+              });
+    
+              const data = await res.json().catch(() => ({}));
+    
+              if (!res.ok) {
+                const msg = data.error || `❌ Erreur serveur (${res.status})`;
+                throw new Error(msg);
+              }
+    
+              console.log(`✅ Statut du devis ${id} mis à jour en ${newStatus}`);
+              e.target.style.backgroundColor =
+                newStatus === "nouvelle"
+                  ? "rgba(255,180,0,0.15)"
+                  : newStatus === "contactée"
+                  ? "rgba(20,184,166,0.15)"
+                  : "rgba(239,68,68,0.15)";
+            } catch (err) {
+              console.error(err);
+              alert("❌ Erreur lors de la mise à jour du statut : " + err.message);
+            } finally {
+              e.target.disabled = false;
+            }
+          });
+        });
+    
+        // === 🗑️ Bouton Supprimer ===
+        tableBody.querySelectorAll(".danger").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            const id = e.currentTarget.dataset.id;
+            if (!confirm("Voulez-vous vraiment supprimer ce devis ?")) return;
+            try {
+              const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+              if (!res.ok) throw new Error("❌Erreur suppression");
+              alert("✅ Devis supprimé avec succès !");
+              await render();
+            } catch (err) {
+              console.error(err);
+              alert("❌ Erreur lors de la suppression du devis.");
+            }
+          });
+        });
+      }
+    
+      // === 🔹 Boutons & filtres ===
+      document.getElementById("refreshBtn").addEventListener("click", render);
+      q.addEventListener("input", render);
+      filterStatus.addEventListener("change", render);
+    
+      document.getElementById("exportCsv").addEventListener("click", async () => {
+        const quotes = await fetchQuotes();
+        if (!quotes.length) return alert("Aucun devis à exporter.");
+        const header = Object.keys(quotes[0]);
+        const csv = [
+          header.join(","),
+          ...quotes.map((q) =>
+            header
+              .map((h) => `"${(q[h] || "").toString().replace(/"/g, '""')}"`)
+              .join(",")
+          ),
+        ].join("\n");
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Devis.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    
+      // Premier affichage
+      render();
+    })();
+  </script>
+</body>
+</html>
