@@ -21,10 +21,13 @@ const upload = multer({ storage });
 
 // UPLOAD services
 router.post("/", upload.array("images", 10), (req, res) => {
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+
   const files = req.files.map(f => ({
     filename: f.filename,
-    url: "/uploads/services/" + f.filename
+    url: baseUrl + "/uploads/services/" + f.filename
   }));
+  
   res.json({ success: true, files });
 });
 
@@ -32,10 +35,13 @@ router.post("/", upload.array("images", 10), (req, res) => {
 router.get("/", (req, res) => {
   fs.readdir(servicesDir, (err, files) => {
     if (err) return res.json([]);
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+
     res.json(files.map(name => ({
       filename: name,
-      url: "/uploads/services/" + name
+      url: baseUrl + "/uploads/services/" + name
     })));
+    
   });
 });
 
