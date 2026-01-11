@@ -19,39 +19,29 @@
       </span>
       <span class="brand-name">COR'BAT</span>
     </div>
-    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">
-      ☰
-    </button>    
-    <!-- ======== NAVIGATION ======== -->
-    <nav class="nav" role="navigation" aria-label="Main navigation">
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+    <div class="mobile-menu-overlay" id="mobileOverlay"></div>
+    
+    <nav class="nav mobile-nav" id="mobileMenu" role="navigation" aria-label="Main navigation">
+      <button class="close-menu" id="closeMenu" aria-label="Fermer le menu">✕</button>
+    
       <a href="index.html" class="nav-link">Accueil</a>
       <a href="services.html" class="nav-link">Services</a>
       <a href="portfolio.html" class="nav-link">Portfolio</a>
       <a href="devis.html" class="nav-link">Demander un devis</a>
       <a href="contact.html" class="nav-link">Contact</a>
       <a href="about.html" class="nav-link">À propos</a>
-      <!-- Lien Admin (invisible par défaut) -->
+    
+      <!-- Lien Admin -->
       <a href="admin/login.html"
          class="nav-link admin-link"
          id="adminMenu"
          style="display:none;"
          aria-hidden="true"
          tabindex="-1">Admin</a>
-    </nav>
+    </nav>   
   </header>
-  <div class="mobile-menu-overlay" id="mobileOverlay"></div>
-
-  <nav class="mobile-menu" id="mobileMenu">
-    <button class="close-menu" id="closeMenu">✕</button>
-
-    <a href="index.html">Accueil</a>
-    <a href="services.html">Services</a>
-    <a href="portfolio.html">Portfolio</a>
-    <a href="devis.html">Demander un devis</a>
-    <a href="contact.html">Contact</a>
-    <a href="about.html">À propos</a>
-  </nav>
-
   <!-- ======== STYLES (consolidés) ======== -->
   <style>
     /* === Header moderne === */
@@ -2101,7 +2091,12 @@
       mobileMenu.classList.remove("active");
       mobileOverlay.classList.remove("active");
     }
-    </script>    
+    
+    // Ferme le menu quand on clique sur un lien
+    document.querySelectorAll(".nav-link").forEach(link => {
+      link.addEventListener("click", closeMobileMenu);
+    });
+    </script>     
     <script src="js/script.js"></script>
 </body>
 </html>
