@@ -543,6 +543,140 @@
         padding: 25px 20px;
       }
     }
+    /* ===== CONTACT PREMIUM MOBILE ===== */
+      @media (max-width: 600px) {
+
+      .contact-section {
+        padding: 35px 15px;
+        border-radius: 0;
+      }
+
+      .contact-title {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .contact-card {
+        padding: 22px 18px;
+        border-radius: 18px;
+      }
+
+      /* ===== Coordonnées ===== */
+      .contact-info {
+        margin-top: 10px;
+      }
+
+      .contact-info li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 14px;
+        line-height: 1.6;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .contact-info li:last-child {
+        border-bottom: none;
+      }
+
+      .contact-info svg {
+        min-width: 22px;
+        height: 22px;
+        margin-top: 2px;
+      }
+
+      .contact-info strong {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .contact-info a {
+        display: inline-block;
+        color: #ff6b6b;
+        font-weight: 600;
+        word-break: break-word;
+        padding: 3px 0;
+      }
+
+      /* ===== Formulaire ===== */
+      .modern-form {
+        gap: 16px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+      }
+
+      input {
+        font-size: 16px; /* évite le zoom iOS */
+        padding: 15px 16px;
+        border-radius: 14px;
+        border: 1px solid #e5e5e5;
+        background: #fdfdfd;
+        transition: 0.25s ease;
+      }
+
+      input:focus {
+        border-color: #ffb400;
+        box-shadow: 0 0 0 4px rgba(255,180,0,0.15);
+        background: #fff;
+      }
+
+      small {
+        font-size: 12px;
+      }
+
+      /* ===== Bouton ===== */
+      .btn-primary {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px;
+        border-radius: 16px;
+        margin-top: 10px;
+      }
+
+      .btn-primary:active {
+        transform: scale(0.97);
+        opacity: 0.9;
+      }
+      }
+      .contact-card {
+        animation: fadeUp 0.6s ease both;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(25px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .contact-info a:active {
+        opacity: 0.6;
+      }
+
+      input:active {
+        transform: scale(0.995);
+      }
+
   </style>
 
   <footer class="site-footer">
