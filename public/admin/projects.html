@@ -80,6 +80,10 @@
   </header>
   <!-- ======== STYLES (consolidés) ======== -->
   <style>
+    /* Desktop */
+    .nav {
+      display: flex;
+    }
     /* === Header moderne === */
     .topbar {
       display: flex;
@@ -178,27 +182,8 @@
       background: #fff;
       border-radius: 3px;
     }
-    /* === Responsive === */
-    @media (max-width: 1024px) {
-      .nav {
-        display: none;
-        position: absolute;
-        top: 70px;
-        right: 20px;
-        background: #000;
-        flex-direction: column;
-        padding: 18px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        gap: 12px;
-        min-width: 200px;
-      }
-      .nav.active { display: flex; }
-      .menu-toggle { display: flex; }
-      .brand .brand-name { font-size: 1.1rem; }
-    }
-        /* ===== Mobile menu admin ===== */
-        .menu-toggle {
+    /* ===== Mobile menu admin ===== */
+    .menu-toggle {
       background: none;
       border: none;
       font-size: 1.8rem;
