@@ -20,21 +20,28 @@
         <span class="brand-name">COR'BAT</span>
       </div>
       <!-- ======== NAVIGATION ======== -->
-      <nav class="nav" role="navigation" aria-label="Main navigation">
+      <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+      <div class="mobile-menu-overlay" id="mobileOverlay"></div>
+      
+      <nav class="nav mobile-nav" id="mobileMenu" role="navigation" aria-label="Main navigation">
+        <button class="close-menu" id="closeMenu" aria-label="Fermer le menu">✕</button>
+      
         <a href="index.html" class="nav-link">Accueil</a>
         <a href="services.html" class="nav-link">Services</a>
         <a href="portfolio.html" class="nav-link">Portfolio</a>
         <a href="devis.html" class="nav-link">Demander un devis</a>
         <a href="contact.html" class="nav-link">Contact</a>
         <a href="about.html" class="nav-link">À propos</a>
-        <!-- Lien Admin (invisible par défaut) -->
+      
+        <!-- Lien Admin -->
         <a href="admin/login.html"
            class="nav-link admin-link"
            id="adminMenu"
            style="display:none;"
            aria-hidden="true"
            tabindex="-1">Admin</a>
-      </nav>
+      </nav>  
     </header>
     <!-- ======== STYLES (consolidés) ======== -->
     <style>
@@ -426,50 +433,17 @@
             <span class="company-badge">Entreprise</span>
           </div>
           <p class="lux-separator">Construction <span class="star">★</span> Rénovation <span class="star">★</span> Design</p>
-          <p>
-            <svg xmlns="http://www.w3.org/2000/svg"
-            width="24" height="24"
-            viewBox="0 0 64 64"
-            fill="none"
-            stroke-linecap="round"
-            stroke-linejoin="round">
-          <!-- Cercle -->
-          <circle cx="32" cy="32" r="30"
-                  stroke="#E0E0E0"
-                  stroke-width="2"/>
-          <!-- Téléphone -->
-          <path d="M22 10
-                  h12
-                  a4 4 0 0 1 4 4
-                  v36
-                  a4 4 0 0 1 -4 4
-                  h-12
-                  a4 4 0 0 1 -4 -4
-                  v-36
-                  a4 4 0 0 1 4 -4
-                  z"
-                stroke="#0A66C2"
-                stroke-width="2.5"/>
-          <circle cx="28" cy="48" r="1.5" fill="#0A66C2"/>
-          <!-- Ondes WiFi à droite -->
-          <path d="M42 26
-                  a6 6 0 0 1 0 12"
-                stroke="#2ECC71"
-                stroke-width="2"/>
-          <path d="M46 23
-                  a9 9 0 0 1 0 18"
-                stroke="#2ECC71"
-                stroke-width="2"/>
-          <path d="M50 20
-                  a12 12 0 0 1 0 24"
-                stroke="#2ECC71"
-                stroke-width="2"/>
-          </svg>
-            Tél : 
-            <a href="tel:+261338790262">+261 33 87 902 62</a> •
-            <a href="tel:+261376341770">+261 37 63 417 70</a> •
-            <a href="tel:+261380881659">+261 38 08 816 59</a>
-          </p>      
+          <div class="footer-contact">
+            <div class="contact-item">
+              📞 <a href="tel:+261338790262">+261 33 87 902 62</a>
+            </div>
+            <div class="contact-item">
+              📞 <a href="tel:+261376341770">+261 37 63 417 70</a>
+            </div>
+            <div class="contact-item">
+              📞 <a href="tel:+261380881659">+261 38 08 816 59</a>
+            </div>
+          </div>
           <p>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64" fill="none">
               <circle cx="32" cy="32" r="30" stroke="#E0E0E0" stroke-width="2"/>
@@ -614,6 +588,205 @@
         letter-spacing: 1px;
         font-weight: 600;
       }
+      .footer-contact {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    /* =========================
+      FOOTER MOBILE OPTIMIZATION
+      ========================= */
+
+    @media (max-width: 768px) {
+      .site-footer {
+        padding: 35px 20px 15px 20px;
+        border-top-left-radius: 18px;
+        border-top-right-radius: 18px;
+      }
+
+      .footer-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .footer-about,
+      .footer-social {
+        text-align: center;
+        width: 100%;
+      }
+
+      .footer-brand {
+        justify-content: center;
+      }
+
+      .footer-about h4,
+      .footer-social h4 {
+        font-size: 1.3rem;
+      }
+
+      .lux-separator {
+        font-size: 16px;
+        text-align: center;
+      }
+
+      .footer-about p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .footer-about p svg {
+        vertical-align: middle;
+        margin-right: 6px;
+      }
+
+      .footer-social h4 {
+        margin-left: 0;
+      }
+
+      .footer-social .social-links {
+        justify-content: center;
+        margin-left: 0;
+        gap: 18px;
+      }
+
+      .footer-social .social {
+        font-size: 1.6rem;
+      }
+
+      .footer-bottom {
+        font-size: 0.85rem;
+      }
+
+      .footer-bottom .dev-credit {
+        font-size: 10.5px;
+      }
+
+      .company-badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+      }
+    }
+    @media (max-width: 768px) {
+    .site-footer {
+      backdrop-filter: blur(6px);
+    }
+
+    .footer-social .social {
+      background: rgba(255,255,255,0.08);
+      padding: 12px;
+      border-radius: 50%;
+    }
+
+    .footer-social .social:active {
+      transform: scale(0.9);
+    }
+  }
+  /* =========================
+      FOOTER MOBILE FIX PRO
+      ========================= */
+    @media (max-width: 768px) {
+
+    .site-footer {
+      padding: 30px 16px 15px;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .footer-container {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 26px;
+    }
+
+    .footer-about,
+    .footer-social {
+      width: 100%;
+    }
+
+    .footer-brand {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .footer-about h4 {
+      font-size: 1.3rem;
+    }
+
+    .company-badge {
+      font-size: 0.65rem;
+      padding: 3px 8px;
+    }
+
+    .lux-separator {
+      font-size: 15px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .lux-separator .star {
+      padding: 0 6px;
+      font-size: 18px;
+    }
+
+    .footer-about p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      max-width: 300px;
+      margin: 0 auto 10px;
+    }
+
+    .footer-about p svg {
+      display: block;
+      margin: 0 auto 6px;
+    }
+
+    .footer-about a {
+      display: inline-block;
+      word-break: break-word;
+    }
+
+    /* Téléphones en colonne */
+    .footer-about p a {
+      display: block;
+      margin: 4px 0;
+    }
+
+    .footer-social h4 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .footer-social .social-links {
+      justify-content: center;
+      margin: 10px 0 0;
+      gap: 16px;
+    }
+
+    .footer-social .social {
+      font-size: 1.4rem;
+      background: rgba(255,255,255,0.08);
+      padding: 12px;
+      border-radius: 50%;
+    }
+
+    .footer-bottom {
+      margin-top: 25px;
+      font-size: 0.8rem;
+    }
+
+    .footer-bottom p {
+      margin: 4px 0;
+    }
+
+    .footer-bottom .dev-credit {
+      font-size: 10px;
+      line-height: 1.4;
+    }
+    }
     </style>
 
     <script src="js/script.js"></script>
