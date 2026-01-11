@@ -10,7 +10,13 @@
       <span class="brand-name">Admin COR'BAT</span>
     </div>
     <!-- ======== NAVIGATION ======== -->
-    <nav class="nav" role="navigation" aria-label="Main navigation">
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+    <div class="mobile-menu-overlay" id="mobileOverlay"></div>
+    
+    <nav class="nav mobile-nav" id="mobileMenu" role="navigation" aria-label="Main navigation">
+      <button class="close-menu" id="closeMenu" aria-label="Fermer le menu">✕</button>
+    
       <a href="dashboard.html" class="nav-link">Tableau de bord</a>
       <a href="devis.html" class="nav-link">Liste devis</a>
       <a href="leads.html" class="nav-link">Clients intéressés</a>
@@ -21,8 +27,7 @@
         <button id="btnChangePass" class="btn-ghost small">Changer mot de passe</button>
         <button id="btnLogout" class="btn-logout">Se déconnecter</button>
       </div>
-    </nav>
-  </header>
+    </nav> 
   <!-- ======== STYLES (consolidés) ======== -->
   <style>
     /* ===== Bouton "Changer mot de passe" moderne ===== */
@@ -718,6 +723,30 @@
     };
     </script>
 
+    <script>
+      const menuToggle = document.getElementById("menuToggle");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const mobileOverlay = document.getElementById("mobileOverlay");
+      const closeMenu = document.getElementById("closeMenu");
+      
+      menuToggle.addEventListener("click", () => {
+        mobileMenu.classList.add("active");
+        mobileOverlay.classList.add("active");
+      });
+      
+      closeMenu.addEventListener("click", closeMobileMenu);
+      mobileOverlay.addEventListener("click", closeMobileMenu);
+      
+      function closeMobileMenu() {
+        mobileMenu.classList.remove("active");
+        mobileOverlay.classList.remove("active");
+      }
+      
+      // Ferme le menu quand on clique sur un lien
+      document.querySelectorAll(".nav-link").forEach(link => {
+        link.addEventListener("click", closeMobileMenu);
+      });
+      </script> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/admin.js"></script>
 </body>
