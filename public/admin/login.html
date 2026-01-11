@@ -61,6 +61,125 @@
     .pw-strength { height:8px; width:100%; background:rgba(255,255,255,0.03); margin-top:8px; border-radius:6px; overflow:hidden; }
     .pw-bar { height:100%; width:0%; background:rgb(10, 110, 10); transition: width .25s ease; }
     @media (max-width:980px){ .auth-grid{ grid-template-columns: 1fr; padding:0 0; gap:18px; } }
+    /* ========== MOBILE PREMIUM LOGIN ========== */
+    @media (max-width: 600px) {
+
+    .auth-wrap {
+      padding: 24px 14px;
+    }
+
+    .auth-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .panel {
+      padding: 22px;
+      border-radius: 16px;
+    }
+
+    .card {
+      padding: 22px;
+      border-radius: 16px;
+    }
+
+    .brand {
+      justify-content: center;
+      text-align: center;
+    }
+
+    .brand h2 {
+      font-size: 1.2rem;
+    }
+
+    .panel p {
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .features {
+      display: none; /* optionnel : masque pour alléger mobile */
+    }
+
+    .card h3 {
+      text-align: center;
+      font-size: 1.3rem;
+    }
+
+    .card p.lead {
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      padding: 14px 46px 14px 14px;
+      font-size: 1rem;
+      border-radius: 12px;
+    }
+
+    .controls {
+      justify-content: center;
+    }
+
+    .forgot {
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+      padding: 14px;
+      font-size: 1rem;
+      border-radius: 14px;
+    }
+
+    .meta {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .input-icon {
+      top: 42px;
+    }
+
+    .pw-strength {
+      height: 6px;
+    }
+
+    /* Stack buttons vertically */
+    form > div:last-of-type {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #statusWrap {
+      margin-left: 0 !important;
+      width: 100%;
+      text-align: center;
+    }
+
+    .msg {
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    }
+    .mobile-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .mobile-actions {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -126,7 +245,7 @@
             <a class="forgot" href="forgot.html">Mot de passe oublié ?</a>
           </div>
 
-          <div style="display:flex;gap:10px;align-items:center;margin-top:16px;">
+          <div class="mobile-actions">
             <button type="submit" class="btn btn-primary" id="submitBtn" aria-live="polite">
               <span id="btnContent">Se connecter</span>
             </button>
