@@ -251,7 +251,7 @@
   </script>
   
   <main class="container section about">
-    <section class="intro">
+    <section class="intro mobile-center">
       <h1>À propos de <span>COR'BAT</span></h1>
       <p>
         <strong>COR'BAT</strong> est une entreprise de construction et de rénovation reconnue pour son expertise,
@@ -446,6 +446,76 @@
       .about {
         padding: 60px 6%;
       }
+    }
+    /* ========== MOBILE PREMIUM ========= */
+    @media (max-width: 600px) {
+
+    .about {
+      padding: 50px 18px;
+      line-height: 1.7;
+    }
+
+    .about h1 {
+      font-size: 1.7rem;
+      text-align: center;
+    }
+
+    .about h2 {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .about p {
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    /* Intro */
+    .intro {
+      text-align: center;
+    }
+
+    /* Valeurs */
+    .grid-3 {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      padding: 22px;
+      border-radius: 16px;
+    }
+
+    .card h4 {
+      font-size: 1.15rem;
+      text-align: center;
+    }
+
+    .card p {
+      text-align: center;
+    }
+
+    /* Team */
+    .team-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .team-card {
+      padding: 22px;
+    }
+
+    .team-card .nameteam {
+      font-size: 1.25rem;
+    }
+
+    .team-card p {
+      font-size: 0.95rem;
+    }
+    }
+    .mobile-center {
+      max-width: 720px;
+      margin: auto;
     }
   </style>
   
