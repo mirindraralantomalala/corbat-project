@@ -275,6 +275,94 @@
         from {opacity:0; transform:translateY(20px);}
         to {opacity:1; transform:translateY(0);}
       }
+      /* =========================
+        FORMULAIRE PREMIUM iOS
+        ========================= */
+
+      @media (max-width: 768px) {
+
+      .devis-container {
+        padding: 18px 12px;
+        align-items: flex-start;
+        background: linear-gradient(180deg, #f5f6fa, #ffffff);
+      }
+
+      .devis-card {
+        padding: 22px 16px;
+        border-radius: 22px;
+        box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+      }
+
+      .devis-card h1 {
+        font-size: 1.75rem;
+        line-height: 1.2;
+        margin-bottom: 8px;
+      }
+
+      .section-sub {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        max-width: 95%;
+        margin: 0 auto 24px;
+        opacity: 0.8;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 6px;
+        opacity: 0.7;
+      }
+
+      input,
+      select,
+      textarea {
+        font-size: 16px;
+        padding: 15px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(0,0,0,0.08);
+        background: rgba(255,255,255,0.9);
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+      }
+
+      input:focus,
+      textarea:focus {
+        border-color: #007aff;
+        box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
+      }
+
+      .btn-container {
+        flex-direction: column;
+        gap: 14px;
+        margin-top: 25px;
+      }
+
+      .btn-primary {
+        width: 100%;
+        padding: 16px 0;
+        border-radius: 16px;
+        font-size: 16px;
+        background: linear-gradient(180deg, #34c759, #28a745);
+        box-shadow: 0 10px 20px rgba(52,199,89,0.35);
+      }
+
+      .btn-primary:active {
+        transform: scale(0.97);
+      }
+
+      .btn-ghost {
+        width: 100%;
+        padding: 15px 0;
+        border-radius: 16px;
+        font-size: 15px;
+      }
+
+      }
     </style>      
     <!-- ======== SCRIPT DE PROTECTION CTRL + A (sans localStorage) ======== -->
     <script>
@@ -361,12 +449,12 @@
 
         <form id="devisForm">
           <div class="form-grid">
-            <div><label>Nom complet</label><input name="fullname" placeholder="Ex : RAKOTO" required></div>
-            <div><label>Email</label><input type="email" name="email" placeholder="Ex : exemple@gmail.com" required></div>
-            <div><label>Téléphone</label><input name="phone" placeholder="Ex : 033 87 902 62" required></div>
+            <div><label>Nom complet</label><input name="fullname" placeholder="Ex : RAKOTO" required autocomplete="name"></div>
+            <div><label>Email</label><input type="email" name="email" placeholder="Ex : exemple@gmail.com" required autocomplete="email"></div>
+            <div><label>Téléphone</label><input name="phone" placeholder="Ex : 033 87 902 62" required inputmode="tel"></div>
             <div><label>Adresse du chantier</label><input name="address" placeholder="Ex : Lot 02A69 Ampatana"></div>
             <div><label>Service demandé</label><input name="Service" placeholder="Ex : Travaux de maçonnerie générale"></div>
-            <div><label>Surface (m²)</label><input name="surface" type="number" placeholder="Ex : 120"></div>
+            <div><label>Surface (m²)</label><input name="surface" type="number" placeholder="Ex : 120" inputmode="numeric"></div>
           </div>
 
           <div class="btn-container">
