@@ -2318,6 +2318,95 @@
       letter-spacing: 1px;
       font-weight: 600;
     }
+    /* =========================
+      FOOTER MOBILE OPTIMIZATION
+      ========================= */
+
+    @media (max-width: 768px) {
+      .site-footer {
+        padding: 35px 20px 15px 20px;
+        border-top-left-radius: 18px;
+        border-top-right-radius: 18px;
+      }
+
+      .footer-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .footer-about,
+      .footer-social {
+        text-align: center;
+        width: 100%;
+      }
+
+      .footer-brand {
+        justify-content: center;
+      }
+
+      .footer-about h4,
+      .footer-social h4 {
+        font-size: 1.3rem;
+      }
+
+      .lux-separator {
+        font-size: 16px;
+        text-align: center;
+      }
+
+      .footer-about p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .footer-about p svg {
+        vertical-align: middle;
+        margin-right: 6px;
+      }
+
+      .footer-social h4 {
+        margin-left: 0;
+      }
+
+      .footer-social .social-links {
+        justify-content: center;
+        margin-left: 0;
+        gap: 18px;
+      }
+
+      .footer-social .social {
+        font-size: 1.6rem;
+      }
+
+      .footer-bottom {
+        font-size: 0.85rem;
+      }
+
+      .footer-bottom .dev-credit {
+        font-size: 10.5px;
+      }
+
+      .company-badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+      }
+    }
+    @media (max-width: 768px) {
+    .site-footer {
+      backdrop-filter: blur(6px);
+    }
+
+    .footer-social .social {
+      background: rgba(255,255,255,0.08);
+      padding: 12px;
+      border-radius: 50%;
+    }
+
+    .footer-social .social:active {
+      transform: scale(0.9);
+    }
+  }
   </style>
   <script>
     const menuToggle = document.getElementById("menuToggle");
