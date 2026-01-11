@@ -9,25 +9,31 @@
       </span>
       <span class="brand-name">Admin COR'BAT</span>
     </div>
-    <!-- ======== NAVIGATION ======== -->
+  
+    <!-- Bouton mobile -->
     <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
-
+  
+    <!-- Overlay -->
     <div class="mobile-menu-overlay" id="mobileOverlay"></div>
-    
+  
+    <!-- Menu -->
     <nav class="nav mobile-nav" id="mobileMenu" role="navigation" aria-label="Main navigation">
       <button class="close-menu" id="closeMenu" aria-label="Fermer le menu">✕</button>
-    
+  
       <a href="dashboard.html" class="nav-link">Tableau de bord</a>
       <a href="devis.html" class="nav-link">Liste devis</a>
       <a href="leads.html" class="nav-link">Clients intéressés</a>
       <a href="projects.html" class="nav-link">Projets récents</a>
       <a href="services.html" class="nav-link">Nos services</a>
-      <a href="callbacks.html" class="nav-link">Demande de rappel</a>
-      <div class="admin-actions">
-        <button id="btnChangePass" class="btn-ghost small">Changer mot de passe</button>
+      <a href="callbacks.html" class="nav-link">Demandes de rappel</a>
+  
+      <div class="admin-actions-mobile">
+        <button id="btnChangePass" class="btn-ghost">Changer mot de passe</button>
         <button id="btnLogout" class="btn-logout">Se déconnecter</button>
       </div>
-    </nav> 
+    </nav>
+  </header>
+  
   <!-- ======== STYLES (consolidés) ======== -->
   <style>
     /* ===== Bouton "Changer mot de passe" moderne ===== */
@@ -169,6 +175,83 @@
       .menu-toggle { display: flex; }
       .brand .brand-name { font-size: 1.1rem; }
     }
+    /* ===== Mobile menu admin ===== */
+    .menu-toggle {
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: #fff;
+      cursor: pointer;
+      display: none;
+    }
+
+    .mobile-menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.3s ease;
+      z-index: 998;
+    }
+
+    .mobile-menu-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-nav {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 85%;
+      max-width: 340px;
+      height: 100vh;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      gap: 18px;
+      transition: 0.35s ease;
+      z-index: 999;
+    }
+
+    .mobile-nav.active {
+      right: 0;
+    }
+
+    .close-menu {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      align-self: flex-end;
+      cursor: pointer;
+    }
+
+    .mobile-nav .nav-link {
+      font-size: 1.05rem;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .admin-actions-mobile {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .menu-toggle {
+        display: block;
+      }
+
+      .nav:not(.mobile-nav) {
+        display: none;
+      }
+    }
+
   </style>
 
   <main class="container section">
@@ -726,27 +809,22 @@
     <script>
       const menuToggle = document.getElementById("menuToggle");
       const mobileMenu = document.getElementById("mobileMenu");
-      const mobileOverlay = document.getElementById("mobileOverlay");
       const closeMenu = document.getElementById("closeMenu");
-      
+      const overlay = document.getElementById("mobileOverlay");
+
       menuToggle.addEventListener("click", () => {
         mobileMenu.classList.add("active");
-        mobileOverlay.classList.add("active");
+        overlay.classList.add("active");
       });
-      
+
       closeMenu.addEventListener("click", closeMobileMenu);
-      mobileOverlay.addEventListener("click", closeMobileMenu);
-      
+      overlay.addEventListener("click", closeMobileMenu);
+
       function closeMobileMenu() {
         mobileMenu.classList.remove("active");
-        mobileOverlay.classList.remove("active");
+        overlay.classList.remove("active");
       }
-      
-      // Ferme le menu quand on clique sur un lien
-      document.querySelectorAll(".nav-link").forEach(link => {
-        link.addEventListener("click", closeMobileMenu);
-      });
-      </script> 
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/admin.js"></script>
 </body>
