@@ -355,13 +355,21 @@
         transform: scale(0.97);
       }
 
-      .btn-ghost {
+      .btn-ghost { 
         width: 100%;
         padding: 16px 0;
         border-radius: 16px;
         font-size: 16px;
-      }
 
+        display: flex;                /* IMPORTANT */
+        align-items: center;          /* centre verticalement */
+        justify-content: center;      /* centre horizontalement */
+        text-align: center;
+      }
+      .btn-ghost:active {
+        transform: scale(0.97);
+        opacity: 0.8;
+      }
       }
     </style>      
     <!-- ======== SCRIPT DE PROTECTION CTRL + A (sans localStorage) ======== -->
