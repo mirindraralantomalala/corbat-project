@@ -1850,6 +1850,89 @@
         color: #666;
         margin-bottom: 18px;
       }
+      @media (max-width: 768px) {
+        .portfolio-section .section-title,
+        .portfolio-section .section-sub {
+          text-align: center;
+          padding: 0 16px;
+        }
+
+        .portfolio-section .section-title {
+          font-size: 1.8rem;
+        }
+
+        .portfolio-section .section-sub {
+          font-size: 1rem;
+          line-height: 1.6;
+        }
+      }
+
+      @media (max-width: 768px) {
+
+      .portfolio-grid {
+        display: flex !important;
+        flex-direction: column;
+        gap: 0;
+        scroll-snap-type: y mandatory;
+        overflow-y: auto;
+        max-height: 100vh;
+      }
+
+      .portfolio-card {
+        min-height: 100vh;
+        scroll-snap-align: start;
+        border-radius: 0;
+      }
+
+      .portfolio-card .card-image img {
+        height: 100vh;
+        object-fit: cover;
+      }
+
+      .card-info {
+        position: absolute;
+        bottom: 20px;
+        width: 100%;
+        text-align: center;
+        color: white;
+        z-index: 2;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+      }
+
+      .portfolio-card {
+        position: relative;
+      }
+
+      }
+
+      .lightbox {
+        position: fixed;
+        inset: 0;
+        background: black;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+      }
+
+      .lightbox img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      .lightbox.active {
+        display: flex;
+      }
+
+      .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 28px;
+        color: white;
+        cursor: pointer;
+      }
     </style>
     <!-- ========================= SCRIPTS ========================= -->
     <script>
@@ -1909,6 +1992,32 @@
           }
         };
         update();
+      });
+    </script>
+    <script>
+      const portfolioImages = document.querySelectorAll('.portfolio-card img');
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+      const lightboxClose = document.querySelector('.lightbox-close');
+
+      portfolioImages.forEach(img => {
+        img.addEventListener('click', () => {
+          lightboxImg.src = img.src;
+          lightbox.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      lightboxClose.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+
+      lightbox.addEventListener('click', e => {
+        if (e.target === lightbox) {
+          lightbox.classList.remove('active');
+          document.body.style.overflow = '';
+        }
       });
     </script>
     <!-- === INTEREST MODAL === -->
@@ -2328,5 +2437,9 @@
     });
     </script>     
     <script src="js/script.js"></script>
+    <div id="lightbox" class="lightbox">
+      <span class="lightbox-close">✕</span>
+      <img id="lightbox-img" src="">
+    </div>    
 </body>
 </html>
