@@ -311,6 +311,47 @@
         font-size: 1rem;
         font-weight: 500;
       }
+      /* =========================
+        PORTFOLIO — OPTIMISATION MOBILE
+        ========================= */
+
+      @media (max-width: 768px) {
+
+      .portfolio-section h1 {
+        text-align: center;
+        font-size: 1.9rem;
+      }
+
+      .portfolio-section p {
+        text-align: center;
+        max-width: 90%;
+        margin: 0 auto 25px;
+        line-height: 1.7;
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      .portfolio-grid {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 1.5rem;
+      }
+
+      .portfolio-card {
+        width: 100%;
+        max-width: 360px;
+        border-radius: 18px;
+      }
+
+      .card-image img {
+        height: 240px;
+      }
+
+      .card-info p {
+        font-size: 0.95rem;
+      }
+
+      }
     </style>
     
     <script>
@@ -914,5 +955,29 @@
       renderProjects();
     })();
   </script>
+  <script>
+    const menuToggle = document.getElementById("menuToggle");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const mobileOverlay = document.getElementById("mobileOverlay");
+    const closeMenu = document.getElementById("closeMenu");
+    
+    menuToggle.addEventListener("click", () => {
+      mobileMenu.classList.add("active");
+      mobileOverlay.classList.add("active");
+    });
+    
+    closeMenu.addEventListener("click", closeMobileMenu);
+    mobileOverlay.addEventListener("click", closeMobileMenu);
+    
+    function closeMobileMenu() {
+      mobileMenu.classList.remove("active");
+      mobileOverlay.classList.remove("active");
+    }
+    
+    // Ferme le menu quand on clique sur un lien
+    document.querySelectorAll(".nav-link").forEach(link => {
+      link.addEventListener("click", closeMobileMenu);
+    });
+    </script> 
 </body>
 </html>

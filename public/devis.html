@@ -789,6 +789,30 @@
     }
     </style>
 
+    <script>
+      const menuToggle = document.getElementById("menuToggle");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const mobileOverlay = document.getElementById("mobileOverlay");
+      const closeMenu = document.getElementById("closeMenu");
+      
+      menuToggle.addEventListener("click", () => {
+        mobileMenu.classList.add("active");
+        mobileOverlay.classList.add("active");
+      });
+      
+      closeMenu.addEventListener("click", closeMobileMenu);
+      mobileOverlay.addEventListener("click", closeMobileMenu);
+      
+      function closeMobileMenu() {
+        mobileMenu.classList.remove("active");
+        mobileOverlay.classList.remove("active");
+      }
+      
+      // Ferme le menu quand on clique sur un lien
+      document.querySelectorAll(".nav-link").forEach(link => {
+        link.addEventListener("click", closeMobileMenu);
+      });
+      </script> 
     <script src="js/script.js"></script>
   </body>
 </html>
