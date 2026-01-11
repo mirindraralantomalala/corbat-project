@@ -1048,20 +1048,47 @@
     }
 
     }
+
+    @media (max-width: 768px) {
+      #services .section-title,
+      #services .section-sub {
+        text-align: center;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      #services .section-title {
+        font-size: 1.8rem;
+        line-height: 1.2;
+      }
+
+      #services .section-sub {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-top: 10px;
+      }
+    }
+
     /* ===============================
       SERVICES — SWIPE LIBRE (APP)
       =============================== */
     @media (max-width: 768px) {
 
     .grid-2 {
-      scroll-snap-type: none !important;
-      overscroll-behavior-x: contain;
-      scroll-behavior: smooth;
-      touch-action: pan-x;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 24px;
+    }
+
+    .grid-2 {
+      scroll-snap-type: y mandatory;
+      overflow-y: auto;
+      max-height: 100vh;
     }
 
     .grid-2 > .service-card {
-      scroll-snap-align: unset !important;
+      scroll-snap-align: start;
+      min-height: 90vh;
     }
 
     /* Effet de glisse douce */
