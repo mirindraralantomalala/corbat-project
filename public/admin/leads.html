@@ -432,6 +432,27 @@
             }
           });
         });
+
+        function bindDeleteButtons() {
+          document.querySelectorAll(".danger").forEach((btn) => {
+            btn.onclick = async () => {
+              const id = btn.dataset.id;
+              if (!confirm("Voulez-vous vraiment supprimer ce client ?")) return;
+
+              try {
+                const res = await fetch(`/api/leads/${id}`, { method: "DELETE" });
+                if (!res.ok) throw new Error("Erreur suppression");
+
+                alert("✅ Client supprimé avec succès !");
+                render();
+              } catch (err) {
+                console.error(err);
+                alert("❌ Erreur lors de la suppression");
+              }
+            };
+          });
+        }
+
     
         // Voir détails
         document.querySelectorAll(".view-btn").forEach(btn=>{
@@ -451,6 +472,17 @@
           };
         });
       }
+
+      function bindViewButtons(leads) {
+        document.querySelectorAll(".view-btn").forEach(btn => {
+          btn.onclick = () => {
+            const lead = leads.find(x => x.id == btn.dataset.id);
+            if (!lead) return alert("❌Client introuvable");
+            showLeadModal(lead);
+          };
+        });
+      }
+
     
       // Modal
       function showLeadModal(lead){
@@ -476,12 +508,35 @@
     
       searchInput.oninput = render;
       filterStatus.onchange = render;
+      bindDeleteButtons();
+      bindViewButtons(leads);
       render();
     
     })();
   </script>
 
   <style>
+    .danger {
+      background: linear-gradient(135deg, #ff4d4d, #e60000);
+      color: #fff;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(255,0,0,0.25);
+      transition: all 0.2s ease;
+    }
+
+    .danger:hover {
+      transform: scale(1.04);
+      box-shadow: 0 10px 20px rgba(255,0,0,0.35);
+    }
+
+    .danger:active {
+      transform: scale(0.96);
+    }
+
     /* ===== Responsive Table ===== */
 
     @media (max-width: 768px) {
@@ -609,6 +664,13 @@
         flex: 1;
         padding: 10px;
         border-radius: 10px;
+      }
+
+      .danger {
+        width: 100%;
+        padding: 12px;
+        border-radius: 14px;
+        font-size: 15px;
       }
     }
   </style>
