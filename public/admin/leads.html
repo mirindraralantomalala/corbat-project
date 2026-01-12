@@ -373,30 +373,24 @@
           return;
         }
     
-        const mobileContainer = document.getElementById("mobileLeads");
-        mobileContainer.innerHTML = leads.map(l => `
-          <div class="lead-card">
-            <div class="lead-row"><b>Nom</b><span>${safe(l.fullname)}</span></div>
-            <div class="lead-row"><b>Email</b><span>${safe(l.email)}</span></div>
-            <div class="lead-row"><b>Téléphone</b><span>${safe(l.phone)}</span></div>
-            <div class="lead-row"><b>Service</b><span>${safe(l.service)}</span></div>
-            <div class="lead-row"><b>Date</b><span>${fmt(l.created_at)}</span></div>
-
-            <div style="margin-top:8px">
+        tableBody.innerHTML = leads.map(l => `
+          <tr>
+            <td>${safe(l.fullname)}</td>
+            <td>${safe(l.email)}</td>
+            <td>${safe(l.phone)}</td>
+            <td>${safe(l.service)}</td>
+            <td>${fmt(l.created_at)}</td>
+            <td>
               <select class="status-select" data-id="${l.id}">
                 <option value="Nouvelle" ${l.status==="Nouvelle"?"selected":""}>Nouvelle</option>
                 <option value="Contactée" ${l.status==="Contactée"?"selected":""}>Contactée</option>
                 <option value="Résolue" ${l.status==="Résolue"?"selected":""}>Résolue</option>
               </select>
-            </div>
-
-            <div class="lead-actions">
-              <button class="btn-small view-btn" data-id="${l.id}">Voir</button>
-              <button class="danger" data-id="${l.id}">Supprimer</button>
-            </div>
-          </div>
+            </td>
+            <td><button class="btn-small view-btn" data-id="${l.id}">Voir</button></td>
+            <td class="actions"><button class="danger" data-id="${l.id}">Supprimer</button></td>
+          </tr>
         `).join("");
-
 
         // === 🗑️ Bouton Supprimer ===
         tableBody.querySelectorAll(".danger").forEach((btn) => {
