@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#000000">
-  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#0b0b0b">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="COR'BAT">
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
 
   <title>Accueil — COR'BAT</title>
   <link rel="stylesheet" href="css/style.css">
@@ -39,7 +40,11 @@
       <a href="devis.html" class="nav-link">Demander un devis</a>
       <a href="contact.html" class="nav-link">Contact</a>
       <a href="about.html" class="nav-link">À propos</a>
-
+    
+      <!-- Bouton Installer -->
+      <button id="installBtn" class="install-btn-menu">
+        📲 Installer COR'BAT
+      </button>
     
       <!-- Lien Admin -->
       <a href="admin/login.html"
@@ -48,7 +53,7 @@
          style="display:none;"
          aria-hidden="true"
          tabindex="-1">Admin</a>
-    </nav>   
+    </nav>      
     
   </header>
   <!-- ======== STYLES (consolidés) ======== -->
@@ -179,6 +184,38 @@
       .menu-toggle { display: flex; }
       .brand .brand-name { font-size: 1.1rem; }
     }
+
+    .install-btn-menu {
+      margin: 16px auto 0;
+      width: 85%;
+      max-width: 320px;
+
+      background: linear-gradient(135deg, #ff9800, #ff5252);
+      color: white;
+      border: none;
+      border-radius: 999px;
+
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+
+      display: none; /* affiché seulement quand installable */
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+      .install-btn-menu {
+        font-size: 13px;
+        padding: 10px 18px;
+      }
+    }
+
+
   </style>
   <!-- ======== SCRIPT DE PROTECTION CTRL + A (sans localStorage) ======== -->
   <script>
@@ -2535,7 +2572,8 @@
             .catch((err) => console.error("Erreur Service Worker", err));
         });
       }
-      </script>   
+    </script> 
+      
       <script>
         let deferredPrompt;
         const installBtn = document.getElementById("installBtn");
@@ -2543,23 +2581,16 @@
         window.addEventListener("beforeinstallprompt", (e) => {
           e.preventDefault();
           deferredPrompt = e;
-          installBtn.style.display = "block";
+          installBtn.style.display = "flex";
         });
         
         installBtn.addEventListener("click", async () => {
           if (!deferredPrompt) return;
-        
           deferredPrompt.prompt();
-          const choiceResult = await deferredPrompt.userChoice;
-        
-          if (choiceResult.outcome === "accepted") {
-            console.log("Utilisateur a installé l'app");
-          }
-        
+          const choice = await deferredPrompt.userChoice;
           deferredPrompt = null;
           installBtn.style.display = "none";
         });
-        </script>
-           
+        </script>       
 </body>
 </html>
