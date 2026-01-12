@@ -41,8 +41,8 @@
       <a href="callbacks.html" class="nav-link">Demandes de rappel</a>
   
       <div class="admin-actions-mobile">
-        <button id="btnChangePass" class="btn-ghost">Changer mot de passe</button>
-        <button id="btnLogout" class="btn-logout">Se déconnecter</button>
+        <button id="btnChangePassMobile" class="btn-ghost">Changer mot de passe</button>
+        <button id="btnLogoutMobile" class="btn-logout">Se déconnecter</button>
       </div>
     </nav>
   </header>  
@@ -708,24 +708,32 @@
     
       // Déconnexion via backend (efface cookie)
       const btnLogout = document.getElementById('btnLogout');
-      if (btnLogout) {
-        btnLogout.addEventListener('click', async function(){
-          if(!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
-    
-          await fetch("/api/auth/logout", {
-            method: "POST",
-            credentials: "include"
-          });
-    
-          // Nettoyage des ancien restes locaux (optionnel mais propre)
-          localStorage.removeItem('btp_admin_logged');
-          localStorage.removeItem('btp_admin_token');
-          sessionStorage.removeItem('btp_admin_logged');
-          sessionStorage.removeItem('btp_admin_token');
-    
-          window.location.href = "login.html";
+      const btnLogoutMobile = document.getElementById('btnLogoutMobile');
+
+      async function logout() {
+        if(!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
+
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "include"
         });
+
+        localStorage.removeItem('btp_admin_logged');
+        localStorage.removeItem('btp_admin_token');
+        sessionStorage.removeItem('btp_admin_logged');
+        sessionStorage.removeItem('btp_admin_token');
+
+        window.location.href = "login.html";
       }
+
+      if (btnLogout) {
+        btnLogout.addEventListener('click', logout);
+      }
+
+      if (btnLogoutMobile) {
+        btnLogoutMobile.addEventListener('click', logout);
+      }
+
     
       // Bouton vider cache (ne touche pas l’auth)
       const btnClearCache = document.getElementById('btnClearCache');
@@ -767,35 +775,63 @@
   .modal-actions {display:flex;justify-content:flex-end;gap:8px;}
   </style>
 
-  <script>
-    const modal = document.getElementById('changePassModal');
-    document.getElementById('btnChangePass').onclick = () => modal.style.display = 'flex';
-    document.getElementById('closePassModal').onclick = () => modal.style.display = 'none';
-    
-    document.getElementById('savePassBtn').onclick = async () => {
-      const oldPass = document.getElementById('oldPass').value.trim();
-      const newPass = document.getElementById('newPass').value.trim();
-      const confirm = document.getElementById('confirmPass').value.trim();
-    
-      if (!oldPass || !newPass || !confirm)
-        return alert("Veuillez remplir tous les champs.");
-    
-      if (newPass !== confirm)
-        return alert("❌Les nouveaux mots de passe ne correspondent pas. Veuillez recommencer");
-    
+<script>
+  const modal = document.getElementById('changePassModal');
+
+  const btnChangePass = document.getElementById('btnChangePass');
+  const btnChangePassMobile = document.getElementById('btnChangePassMobile');
+  const closePassModal = document.getElementById('closePassModal');
+
+  if (btnChangePass) {
+    btnChangePass.onclick = () => modal.style.display = 'flex';
+  }
+
+  if (btnChangePassMobile) {
+    btnChangePassMobile.onclick = () => modal.style.display = 'flex';
+  }
+
+  if (closePassModal) {
+    closePassModal.onclick = () => modal.style.display = 'none';
+  }
+
+  // Sauvegarde du nouveau mot de passe
+  document.getElementById('savePassBtn').onclick = async () => {
+    const oldPass = document.getElementById('oldPass').value.trim();
+    const newPass = document.getElementById('newPass').value.trim();
+    const confirm = document.getElementById('confirmPass').value.trim();
+
+    if (!oldPass || !newPass || !confirm)
+      return alert("Veuillez remplir tous les champs.");
+
+    if (newPass !== confirm)
+      return alert("❌ Les nouveaux mots de passe ne correspondent pas. Veuillez recommencer");
+
+    try {
       const res = await fetch("/api/auth/change-password", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ oldPass, newPass })
       });
-    
+
       const data = await res.json();
+
       if (!data.success) return alert(data.error);
+
       alert("✅ Mot de passe mis à jour avec succès !");
       modal.style.display = 'none';
-    };
-    </script>
+
+      // Reset champs
+      document.getElementById('oldPass').value = "";
+      document.getElementById('newPass').value = "";
+      document.getElementById('confirmPass').value = "";
+
+    } catch (err) {
+      alert("Erreur réseau. Veuillez réessayer.");
+    }
+  };
+</script>
+
 
     <script>
       const menuToggle = document.getElementById("menuToggle");
