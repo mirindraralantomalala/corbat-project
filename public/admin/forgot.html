@@ -3,18 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <title>Mot de passe oublié — COR'BAT</title>
+
+  <!-- IMPORTANT POUR MOBILE -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="../css/style.css">
   <link rel="icon" type="image/png" href="../favicon.png">
+
+  <style>
+    body.auth-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: #f5f6fa;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .lead {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    input {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 16px; /* empêche zoom iOS */
+      width: 100%;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .msg {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .msg.success {
+      background: #e8fff1;
+      color: #1c7c4c;
+      border: 1px solid #b6f2d2;
+    }
+
+    .msg.error {
+      background: #ffecec;
+      color: #b30000;
+      border: 1px solid #ffb3b3;
+    }
+  </style>
 </head>
+
 <body class="auth-wrap">
 
-<div class="card" style="max-width:420px;margin:auto;">
+<div class="card">
   <h3>Réinitialiser votre mot de passe</h3>
-  <p class="lead">Veuillez entrez votre email et nous vous enverrons un lien sécurisé.</p>
+  <p class="lead">Veuillez entrer votre email et nous vous enverrons un lien sécurisé.</p>
 
   <form id="forgotForm">
     <label for="email">Email</label>
-    <input type="email" id="email" required>
+    <input type="email" id="email" required placeholder="exemple@email.com">
     <button class="btn-primary" type="submit">Envoyer</button>
   </form>
 
@@ -31,7 +113,6 @@ const form = document.getElementById("forgotForm");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Reset messages
   okMsg.style.display = "none";
   errMsg.style.display = "none";
   okMsg.textContent = "";
@@ -44,7 +125,6 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify({ email: emailEl.value.trim() })
     });
 
-    // Try parse JSON (guard)
     const data = await res.json().catch(() => ({}));
 
     if (res.ok && data.success) {
