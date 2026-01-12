@@ -707,7 +707,17 @@
       .admin-links a:hover { background:rgba(255,255,255,0.02); color:#fff; }
       .admin-actions { display:flex; gap:8px; align-items:center; }
       .btn-ghost.small { padding:6px 10px; background:transparent; color:#ccc; border:1px solid rgba(255,255,255,0.03); border-radius:8px; cursor:pointer; }
-      .btn-logout { background:#ef4444; color:#ffffff; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
+      .btn-logout { 
+        background:#ef4444; 
+        color:#ffffff; 
+        border-radius:8px; 
+        width: auto;              /* ❌ pas 100% */
+        padding: 8px 14px;        /* taille compacte */
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+       }
       .admin-footer-bottom { text-align:center; margin-top:12px; color:#9a9a9a; font-size:0.88rem; border-top:1px solid rgba(255,255,255,0.02); padding-top:10px; }
       .dev-credit {
         position: fixed;
