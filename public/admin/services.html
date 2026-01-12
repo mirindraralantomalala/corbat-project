@@ -137,6 +137,121 @@
             min-height: 120px;
           }
         }
+        /* 🔒 Sécurité anti-débordement */
+        * {
+          box-sizing: border-box;
+        }
+
+        html, body {
+          width: 100%;
+          overflow-x: hidden;
+        }
+
+        /* Conteneur principal */
+        .container {
+          padding: 12px;
+          width: 100%;
+        }
+
+        /* Liste services */
+        .services-list {
+          width: 100%;
+        }
+
+        /* Card service mobile */
+        .svc-row {
+          flex-wrap: wrap;
+          width: 100%;
+        }
+
+        /* Image service */
+        .svc-thumb {
+          width: 100%;
+          height: auto;
+          max-height: 180px;
+        }
+
+        /* Contenu service */
+        .svc-body {
+          width: 100%;
+        }
+
+        /* Boutons */
+        .svc-actions {
+          width: 100%;
+          flex-wrap: wrap;
+        }
+
+        .svc-actions button {
+          flex: 1;
+          min-width: 120px;
+        }
+
+        /* Formulaire */
+        form {
+          width: 100%;
+        }
+
+        input,
+        textarea,
+        select,
+        button {
+          max-width: 100%;
+        }
+
+        /* Grid principal */
+        .grid {
+          width: 100%;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+          .grid {
+            grid-template-columns: 1fr;
+          }
+
+          .svc-row {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .svc-thumb {
+            width: 100%;
+            height: 160px;
+          }
+
+          .svc-actions {
+            flex-direction: column;
+            gap: 8px;
+          }
+
+          .btn {
+            width: 100%;
+          }
+        }
+        .btn-danger {
+          background: linear-gradient(135deg, #ff3b3b, #d60000);
+          color: #fff;
+          border: none;
+          border-radius: 10px;
+          padding: 10px 14px;
+          font-weight: 700;
+          box-shadow: 0 4px 12px rgba(255, 0, 0, 0.25);
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn-danger:active {
+          transform: scale(0.97);
+        }
+
+        .btn-danger:hover {
+          box-shadow: 0 6px 16px rgba(255, 0, 0, 0.35);
+        }
+        .del-btn {
+          touch-action: manipulation;
+          z-index: 10;
+          position: relative;
+        }
 
   </style>
 </head>
@@ -481,7 +596,7 @@
                 </div>
                 <div class="svc-actions">
                   <button class="btn btn-modraf edit-btn" data-id="${s.id}">Modifier</button>
-                  <button class="btn btn-ghost del-btn" data-id="${s.id}">Supprimer</button>
+                  <button class="btn btn-danger del-btn" data-id="${s.id}">Supprimer</button>
                 </div>
               </div>
             </div>
