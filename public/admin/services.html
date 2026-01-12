@@ -197,7 +197,6 @@
         }
 
         .svc-actions button {
-          flex: 1;
           min-width: 120px;
         }
 
@@ -234,7 +233,7 @@
           }
 
           .btn {
-            width: 100%;
+            width: auto;
           }
         }
         .btn-danger {
@@ -367,7 +366,15 @@
           max-width: 100%;
           overflow: hidden;
         }
+        .header-right {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
 
+        .logout-btn {
+          flex-shrink: 0;   /* empêche l’étirement */
+        }
   </style>
 </head>
 <body>
@@ -388,7 +395,7 @@
       <a href="services.html" class="nav-link">Nos services</a>
       <a href="callbacks.html" class="nav-link">Demandes de rappel</a>
   
-      <button id="btnLogout" class="btn-deco">Se déconnecter</button>
+      <button id="btnLogout" class="logout-btn">Se déconnecter</button>
     </nav>
   
     <!-- Bouton mobile -->
@@ -409,7 +416,7 @@
       <a href="callbacks.html" class="nav-link">Demandes de rappel</a>
   
       <div class="admin-actions-mobile">
-        <button id="btnLogoutMobile" class="btn-deco">Se déconnecter</button>
+        <button id="btnLogoutMobile" class="logout-btn">Se déconnecter</button>
       </div>
     </nav>
   </header>
@@ -933,7 +940,16 @@
     .admin-links a:hover { background:rgba(255,255,255,0.02); color:#fff; }
     .admin-actions { display:flex; gap:8px; align-items:center; }
     .btn-ghost.small { padding:6px 10px; background:transparent; color:#ccc; border:1px solid rgba(255,255,255,0.03); border-radius:8px; cursor:pointer; }
-    .btn-deco { background:#ef4444; color:#ffffff; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
+    .logout-btn {
+      width: auto;              /* ❌ pas 100% */
+      padding: 8px 14px;        /* taille compacte */
+      border-radius: 8px;
+      font-weight: 600;
+      white-space: nowrap;      /* empêche le retour à la ligne */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
     .admin-footer-bottom { text-align:center; margin-top:12px; color:#9a9a9a; font-size:0.88rem; border-top:1px solid rgba(255,255,255,0.02); padding-top:10px; }
     .dev-credit {
       position: fixed;
