@@ -595,26 +595,33 @@
         // Mise à jour de l'année footer
         document.getElementById('adminYear').textContent = new Date().getFullYear();
       
-        // Déconnexion via backend (efface cookie)
-        const btnLogout = document.getElementById('btnLogout');
-        if (btnLogout) {
-          btnLogout.addEventListener('click', async function(){
-            if(!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
-      
-            await fetch("/api/auth/logout", {
-              method: "POST",
-              credentials: "include"
-            });
-      
-            // Nettoyage des ancien restes locaux (optionnel mais propre)
-            localStorage.removeItem('btp_admin_logged');
-            localStorage.removeItem('btp_admin_token');
-            sessionStorage.removeItem('btp_admin_logged');
-            sessionStorage.removeItem('btp_admin_token');
-      
-            window.location.href = "login.html";
-          });
-        }
+      // Déconnexion via backend (efface cookie)
+      const btnLogout = document.getElementById('btnLogout');
+      const btnLogoutMobile = document.getElementById('btnLogoutMobile');
+
+      async function logout() {
+        if(!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
+
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "include"
+        });
+
+        localStorage.removeItem('btp_admin_logged');
+        localStorage.removeItem('btp_admin_token');
+        sessionStorage.removeItem('btp_admin_logged');
+        sessionStorage.removeItem('btp_admin_token');
+
+        window.location.href = "login.html";
+      }
+
+      if (btnLogout) {
+        btnLogout.addEventListener('click', logout);
+      }
+
+      if (btnLogoutMobile) {
+        btnLogoutMobile.addEventListener('click', logout);
+      }
       
         // Bouton vider cache (ne touche pas l’auth)
         const btnClearCache = document.getElementById('btnClearCache');
