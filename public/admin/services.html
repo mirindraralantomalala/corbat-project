@@ -593,22 +593,6 @@
     </div>
 
     <div class="grid">
-      <!-- Left: Liste & recherche -->
-      <div class="card">
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-          <input id="searchInput" class="search" placeholder="Rechercher par titre / description..." />
-          <button id="refreshBtn" class="btn btn-modraf" title="Rafraîchir">Rafraîchir</button>
-        </div>
-
-        <div id="servicesList" class="services-list" aria-live="polite">
-          <!-- lignes injectées ici -->
-        </div>
-
-        <div style="margin-top:12px;">
-          <button id="clearAllBtn" class="btn btn-ghost">Supprimer tous les services</button>
-        </div>
-      </div>
-
       <!-- Right: Formulaire d'ajout / edition -->
       <aside class="card">
         <h3 id="formTitle">Ajouter un service</h3>
@@ -656,6 +640,22 @@
         </div>
         </form>
       </aside>
+
+      <!-- Left: Liste & recherche -->
+      <div class="card">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+          <input id="searchInput" class="search" placeholder="Rechercher par titre / description..." />
+          <button id="refreshBtn" class="btn btn-modraf" title="Rafraîchir">Rafraîchir</button>
+        </div>
+
+        <div id="servicesList" class="services-list" aria-live="polite">
+          <!-- lignes injectées ici -->
+        </div>
+
+        <div style="margin-top:12px;">
+          <button id="clearAllBtn" class="btn btn-ghost">Supprimer tous les services</button>
+        </div>
+      </div>
     </div>
   </main>
 
