@@ -16,9 +16,20 @@
     input[type="text"], input[type="number"], textarea, select { width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6e9ef; box-sizing:border-box; }
     textarea { min-height:100px; resize:vertical; }
     .btn { padding:10px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:700; }
-    .btn-primary { background:green; color:#ffffff; }
-    .btn-modraf { background: rgb(0, 225, 255); color:#000000; }
-    .btn-ghost { background:red; border:1px solid #ddd; color:#ffffff; }
+    .btn-primary {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #fff;
+    }
+
+    .btn-modraf {
+      background: linear-gradient(135deg, #06b6d4, #22d3ee);
+      color: #000;
+    }
+
+    .btn-ghost {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+    }
     .services-list { display:flex; flex-direction:column; gap:10px; }
     .svc-row { display:flex; gap:12px; align-items:center; padding:10px; border-radius:10px; border:1px solid #f0f2f5; background:#fff; }
     .svc-thumb { width:84px; height:64px; border-radius:8px; object-fit:cover; background:#f2f2f2; flex:0 0 84px; }
@@ -31,6 +42,102 @@
     .img-preview { width:100%; height:160px; object-fit:cover; border-radius:10px; border:1px solid #eaeaea; }
     .help { font-size:0.9rem; color:#6b7280; margin-top:6px; }
     @media (max-width:980px){ .grid{ grid-template-columns: 1fr; } .svc-row{ flex-direction:row; } }
+    /* ============================
+          RESPONSIVE MOBILE SERVICES
+        ============================ */
+
+        @media (max-width: 768px) {
+          .container {
+            padding: 10px;
+          }
+
+          .grid {
+            grid-template-columns: 1fr;
+          }
+
+          .svc-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+          }
+
+          .svc-thumb {
+            width: 100%;
+            height: 180px;
+          }
+
+          .svc-body {
+            width: 100%;
+          }
+
+          .svc-title {
+            font-size: 1.1rem;
+          }
+
+          .svc-desc {
+            font-size: 0.95rem;
+          }
+
+          .svc-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+          }
+
+          .svc-actions .btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 0.9rem;
+          }
+
+          input, textarea, select {
+            font-size: 16px; /* évite zoom iOS */
+          }
+
+          .img-preview {
+            height: 200px;
+          }
+
+          .card h2 {
+            font-size: 1.3rem;
+          }
+
+          .card h3 {
+            font-size: 1.1rem;
+          }
+
+          .btn {
+            padding: 12px;
+          }
+
+          .search {
+            font-size: 16px;
+          }
+        }
+        @media (max-width: 768px) {
+          .svc-actions {
+            width: 100%;
+          }
+        }
+        @media (max-width: 768px) {
+          .svc-actions button {
+            min-height: 44px; /* norme mobile */
+          }
+        }
+        @media (max-width: 768px) {
+          form {
+            gap: 14px;
+          }
+
+          label {
+            font-size: 0.95rem;
+          }
+
+          textarea {
+            min-height: 120px;
+          }
+        }
+
   </style>
 </head>
 <body>
