@@ -17,6 +17,63 @@
   .btn-see { background:#000000; border:1px solid #ddd; color:#ffffff; }
   .btn-delet { background:red; border:1px solid #ddd; color:#ffffff; }
   .btn-primary{background:linear-gradient(90deg,#ffb400,#ff6b6b);color:#111;font-weight:700;}
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .container {
+      padding: 10px;
+      margin: 0;
+    }
+
+    .card {
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    /* Barre recherche + filtres */
+    .filters-row {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .filters-row input,
+    .filters-row select,
+    .filters-row button {
+      width: 100%;
+    }
+
+    /* Table responsive */
+    .table th,
+    .table td {
+      padding: 8px;
+      font-size: 0.85rem;
+    }
+
+    .table {
+      min-width: 700px;
+    }
+
+    /* Boutons empilés */
+    .actions-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .btn {
+      padding: 6px 8px;
+      font-size: 0.8rem;
+    }
+
+    .status-select {
+      width: 100%;
+    }
+  }
+
   </style>
 </head>
 <body>
@@ -235,7 +292,7 @@
   <main class="container">
     <div class="card">
       <h1>Demandes de rappel</h1>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+      <div class="filters-row" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
         <input id="searchCb" placeholder="Rechercher par nom / téléphone..." style="flex:1;padding:8px;border:1px solid #e6e9ef;border-radius:8px;">
         <select id="filterStatusCb" style="padding:8px;border-radius:8px;">
           <option value="">Tous statuts</option>
@@ -247,7 +304,7 @@
         <button id="clearCb" class="btn btn-delet">Supprimer tout</button>
       </div>
 
-      <div style="overflow:auto;max-height:65vh;">
+      <div style="overflow-x:auto;max-height:65vh;">
         <table class="table" aria-describedby="listCallbacks">
           <thead><tr><th>Nom</th><th>Téléphone</th><th>Moment souhaité le</th><th>Demande envoyé le</th><th>Statut</th><th>Actions</th></tr></thead>
           <tbody id="callbacksTbody"></tbody>
@@ -304,13 +361,13 @@
               <td>${formatDateTime(cb.preferred_time)}</td>
               <td>${formatDateTime(cb.created_at)}</td>
               <td>
-                <select class="status-select">
+                <select class="status-select" style="padding:6px;border-radius:6px;">
                   <option value="nouvelle" ${cb.status==='nouvelle'?'selected':''}>nouvelle</option>
                   <option value="contactée" ${cb.status==='contactée'?'selected':''}>contactée</option>
                   <option value="traitée" ${cb.status==='traitée'?'selected':''}>traitée</option>
                 </select>
               </td>
-              <td>
+              <td class="actions-col">
                 <button class="btn btn-see view-btn">Voir</button>
                 <button class="btn btn-delet del-btn">Supprimer</button>
               </td>
