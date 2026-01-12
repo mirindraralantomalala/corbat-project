@@ -308,6 +308,7 @@
           <!-- Rempli par ../js/admin.js (clé attendue : 'btp_leads') -->
         </tbody>
       </table>
+      <div id="mobileLeads" class="mobile-leads"></div>
     </div>
   </main>
   <!-- Modal pour voir les détails -->
@@ -373,23 +374,47 @@
         }
     
         tableBody.innerHTML = leads.map(l => `
-          <tr>
-            <td>${safe(l.fullname)}</td>
-            <td>${safe(l.email)}</td>
-            <td>${safe(l.phone)}</td>
-            <td>${safe(l.service)}</td>
-            <td>${fmt(l.created_at)}</td>
-            <td>
-              <select class="status-select" data-id="${l.id}">
-                <option value="Nouvelle" ${l.status==="Nouvelle"?"selected":""}>Nouvelle</option>
-                <option value="Contactée" ${l.status==="Contactée"?"selected":""}>Contactée</option>
-                <option value="Résolue" ${l.status==="Résolue"?"selected":""}>Résolue</option>
-              </select>
-            </td>
-            <td><button class="btn-small view-btn" data-id="${l.id}">Voir</button></td>
-            <td class="actions"><button class="danger" data-id="${l.id}">Supprimer</button></td>
-          </tr>
-        `).join("");
+        <tr>
+          <td>${safe(l.fullname)}</td>
+          <td>${safe(l.email)}</td>
+          <td>${safe(l.phone)}</td>
+          <td>${safe(l.service)}</td>
+          <td>${fmt(l.created_at)}</td>
+          <td>
+            <select class="status-select" data-id="${l.id}">
+              <option value="Nouvelle" ${l.status==="Nouvelle"?"selected":""}>Nouvelle</option>
+              <option value="Contactée" ${l.status==="Contactée"?"selected":""}>Contactée</option>
+              <option value="Résolue" ${l.status==="Résolue"?"selected":""}>Résolue</option>
+            </select>
+          </td>
+          <td><button class="btn-small view-btn" data-id="${l.id}">Voir</button></td>
+          <td><button class="danger" data-id="${l.id}">Supprimer</button></td>
+        </tr>
+      `).join("");
+
+      const mobileContainer = document.getElementById("mobileLeads");
+
+      mobileContainer.innerHTML = leads.map(l => `
+        <div class="lead-card">
+          <div class="lead-row"><b>Nom</b><span>${safe(l.fullname)}</span></div>
+          <div class="lead-row"><b>Email</b><span>${safe(l.email)}</span></div>
+          <div class="lead-row"><b>Téléphone</b><span>${safe(l.phone)}</span></div>
+          <div class="lead-row"><b>Service</b><span>${safe(l.service)}</span></div>
+          <div class="lead-row"><b>Date</b><span>${fmt(l.created_at)}</span></div>
+
+          <select class="status-select" data-id="${l.id}">
+            <option value="Nouvelle" ${l.status==="Nouvelle"?"selected":""}>Nouvelle</option>
+            <option value="Contactée" ${l.status==="Contactée"?"selected":""}>Contactée</option>
+            <option value="Résolue" ${l.status==="Résolue"?"selected":""}>Résolue</option>
+          </select>
+
+          <div class="lead-actions">
+            <button class="btn-small view-btn" data-id="${l.id}">Voir</button>
+            <button class="danger" data-id="${l.id}">Supprimer</button>
+          </div>
+        </div>
+      `).join("");
+
 
         // === 🗑️ Bouton Supprimer ===
         tableBody.querySelectorAll(".danger").forEach((btn) => {
@@ -542,6 +567,49 @@
       border-radius: 16px;
     }
 
+    }
+
+    /* Desktop */
+    .mobile-leads {
+      display: none;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      table {
+        display: none;
+      }
+
+      .mobile-leads {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .lead-card {
+        background: #fff;
+        padding: 14px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      }
+
+      .lead-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+
+      .lead-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .lead-actions button {
+        flex: 1;
+        padding: 10px;
+        border-radius: 10px;
+      }
     }
   </style>
     <!-- ========== Admin Footer ========== -->
