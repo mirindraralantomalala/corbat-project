@@ -327,197 +327,161 @@
     (async function(){
       const API_URL = "/api/leads";
       const tableBody = document.querySelector("#leadsTable tbody");
+      const mobileContainer = document.getElementById("mobileLeads");
       const searchInput = document.getElementById("search");
       const filterStatus = document.getElementById("filterStatus");
       const exportBtn = document.getElementById("exportCsv");
-    
+
       const safe = v => v || "-";
       const fmt = d => d ? new Date(d).toLocaleString("fr-FR") : "-";
-    
+
       async function fetchLeads() {
         const res = await fetch(API_URL);
-        if (!res.ok) throw new Error("❌Erreur serveur");
+        if (!res.ok) throw new Error("Erreur serveur");
         return await res.json();
       }
-    
+
       async function updateStatus(id, newStatus) {
-        try {
-          const res = await fetch(`${API_URL}/${id}/status`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: newStatus })
-          });
-          if (!res.ok) throw new Error("❌Erreur serveur");
-          return true;
-        } catch (e) {
-          alert("❌ Erreur lors de la mise à jour du statut : " + e.message);
-          return false;
-        }
+        const res = await fetch(`${API_URL}/${id}/status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus })
+        });
+        return res.ok;
       }
-    
-      async function render() {
-        let leads = await fetchLeads();
-    
-        const search = searchInput.value.toLowerCase();
-        const filter = filterStatus.value.toLowerCase();
-    
-        if (filter)
-          leads = leads.filter(l => (l.status || "").toLowerCase() === filter);
-        if (search)
-          leads = leads.filter(l =>
-            ((l.fullname||"") + (l.email||"") + (l.service||"")).toLowerCase().includes(search)
-          );
-    
-        if (!leads.length) {
-          tableBody.innerHTML = `<tr><td colspan="7" style="padding:20px;text-align:center;color:#777;">Aucun client trouvé.</td></tr>`;
+
+      async function deleteLead(id) {
+        if (!confirm("Voulez-vous vraiment supprimer ce client ?")) return;
+        const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        if (!res.ok) {
+          alert("Erreur suppression");
           return;
         }
-    
+        alert("✅ Client supprimé !");
+        render();
+      }
+
+      function bindEvents(leads) {
+        // Boutons supprimer
+        document.querySelectorAll(".danger").forEach(btn => {
+          btn.onclick = () => deleteLead(btn.dataset.id);
+        });
+
+        // Boutons voir
+        document.querySelectorAll(".view-btn").forEach(btn => {
+          btn.onclick = () => {
+            const lead = leads.find(l => l.id == btn.dataset.id);
+            if (!lead) return alert("Client introuvable");
+            showLeadModal(lead);
+          };
+        });
+
+        // Select statut
+        document.querySelectorAll(".status-select").forEach(sel => {
+          sel.onchange = async () => {
+            const ok = await updateStatus(sel.dataset.id, sel.value);
+            if (ok) render();
+          };
+        });
+      }
+
+      async function render() {
+        let leads = await fetchLeads();
+
+        const search = searchInput.value.toLowerCase();
+        const filter = filterStatus.value.toLowerCase();
+
+        if (filter)
+          leads = leads.filter(l => (l.status || "").toLowerCase() === filter);
+
+        if (search)
+          leads = leads.filter(l =>
+            ((l.fullname||"") + (l.email||"") + (l.service||""))
+              .toLowerCase()
+              .includes(search)
+          );
+
+        // Desktop table
+        if (!leads.length) {
+          tableBody.innerHTML = `<tr><td colspan="7" style="padding:20px;text-align:center;color:#777;">Aucun client trouvé.</td></tr>`;
+          mobileContainer.innerHTML = "";
+          return;
+        }
+
         tableBody.innerHTML = leads.map(l => `
-        <tr>
-          <td>${safe(l.fullname)}</td>
-          <td>${safe(l.email)}</td>
-          <td>${safe(l.phone)}</td>
-          <td>${safe(l.service)}</td>
-          <td>${fmt(l.created_at)}</td>
-          <td>
+          <tr>
+            <td>${safe(l.fullname)}</td>
+            <td>${safe(l.email)}</td>
+            <td>${safe(l.phone)}</td>
+            <td>${safe(l.service)}</td>
+            <td>${fmt(l.created_at)}</td>
+            <td>
+              <select class="status-select" data-id="${l.id}">
+                <option value="Nouvelle" ${l.status==="Nouvelle"?"selected":""}>Nouvelle</option>
+                <option value="Contactée" ${l.status==="Contactée"?"selected":""}>Contactée</option>
+                <option value="Résolue" ${l.status==="Résolue"?"selected":""}>Résolue</option>
+              </select>
+            </td>
+            <td>
+              <button class="btn-small view-btn" data-id="${l.id}">Voir</button>
+              <button class="danger" data-id="${l.id}">Supprimer</button>
+            </td>
+          </tr>
+        `).join("");
+
+        // Mobile cards
+        mobileContainer.innerHTML = leads.map(l => `
+          <div class="lead-card">
+            <div class="lead-row"><b>Nom</b><span>${safe(l.fullname)}</span></div>
+            <div class="lead-row"><b>Email</b><span>${safe(l.email)}</span></div>
+            <div class="lead-row"><b>Téléphone</b><span>${safe(l.phone)}</span></div>
+            <div class="lead-row"><b>Service</b><span>${safe(l.service)}</span></div>
+            <div class="lead-row"><b>Date</b><span>${fmt(l.created_at)}</span></div>
+
             <select class="status-select" data-id="${l.id}">
               <option value="Nouvelle" ${l.status==="Nouvelle"?"selected":""}>Nouvelle</option>
               <option value="Contactée" ${l.status==="Contactée"?"selected":""}>Contactée</option>
               <option value="Résolue" ${l.status==="Résolue"?"selected":""}>Résolue</option>
             </select>
-          </td>
-          <td><button class="btn-small view-btn" data-id="${l.id}">Voir</button></td>
-          <td><button class="danger" data-id="${l.id}">Supprimer</button></td>
-        </tr>
-      `).join("");
 
-      const mobileContainer = document.getElementById("mobileLeads");
-
-      mobileContainer.innerHTML = leads.map(l => `
-        <div class="lead-card">
-          <div class="lead-row"><b>Nom</b><span>${safe(l.fullname)}</span></div>
-          <div class="lead-row"><b>Email</b><span>${safe(l.email)}</span></div>
-          <div class="lead-row"><b>Téléphone</b><span>${safe(l.phone)}</span></div>
-          <div class="lead-row"><b>Service</b><span>${safe(l.service)}</span></div>
-          <div class="lead-row"><b>Date</b><span>${fmt(l.created_at)}</span></div>
-
-          <select class="status-select" data-id="${l.id}">
-            <option value="Nouvelle" ${l.status==="Nouvelle"?"selected":""}>Nouvelle</option>
-            <option value="Contactée" ${l.status==="Contactée"?"selected":""}>Contactée</option>
-            <option value="Résolue" ${l.status==="Résolue"?"selected":""}>Résolue</option>
-          </select>
-
-          <div class="lead-actions">
-            <button class="btn-small view-btn" data-id="${l.id}">Voir</button>
-            <button class="danger" data-id="${l.id}">Supprimer</button>
+            <div class="lead-actions">
+              <button class="btn-small view-btn" data-id="${l.id}">Voir</button>
+              <button class="danger" data-id="${l.id}">Supprimer</button>
+            </div>
           </div>
-        </div>
-      `).join("");
+        `).join("");
 
-
-        // === 🗑️ Bouton Supprimer ===
-        tableBody.querySelectorAll(".danger").forEach((btn) => {
-          btn.addEventListener("click", async (e) => {
-            const id = e.currentTarget.dataset.id;
-            if (!confirm("Voulez-vous vraiment supprimer ce client ?")) return;
-            try {
-              const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-              if (!res.ok) throw new Error("❌Erreur suppression");
-              alert("✅ Client supprimé avec succès !");
-              await render();
-            } catch (err) {
-              console.error("❌Erreur suppression client:", err);
-              alert("❌ Erreur lors de la suppression du client.");
-            }
-          });
-        });
-
-        function bindDeleteButtons() {
-          document.querySelectorAll(".danger").forEach((btn) => {
-            btn.onclick = async () => {
-              const id = btn.dataset.id;
-              if (!confirm("Voulez-vous vraiment supprimer ce client ?")) return;
-
-              try {
-                const res = await fetch(`/api/leads/${id}`, { method: "DELETE" });
-                if (!res.ok) throw new Error("Erreur suppression");
-
-                alert("✅ Client supprimé avec succès !");
-                render();
-              } catch (err) {
-                console.error(err);
-                alert("❌ Erreur lors de la suppression");
-              }
-            };
-          });
-        }
-
-    
-        // Voir détails
-        document.querySelectorAll(".view-btn").forEach(btn=>{
-          btn.onclick = ()=>{
-            const lead = leads.find(x=>x.id===btn.dataset.id);
-            if(!lead) return alert("❌Client introuvable");
-            showLeadModal(lead);
-          };
-        });
-    
-        // Mise à jour du statut
-        document.querySelectorAll(".status-select").forEach(sel=>{
-          sel.onchange = async ()=>{
-            const id = sel.dataset.id;
-            const ok = await updateStatus(id, sel.value);
-            if(ok) render();
-          };
-        });
+        bindEvents(leads);
       }
 
-      function bindViewButtons(leads) {
-        document.querySelectorAll(".view-btn").forEach(btn => {
-          btn.onclick = () => {
-            const lead = leads.find(x => x.id == btn.dataset.id);
-            if (!lead) return alert("❌Client introuvable");
-            showLeadModal(lead);
-          };
-        });
-      }
-
-    
-      // Modal
       function showLeadModal(lead){
         const modal = document.getElementById("leadModal");
         const target = document.getElementById("leadDetails");
         target.innerHTML = `
-          <div class="modal-row"><b>Nom :</b><div>${safe(lead.fullname)}</div></div>
-          <div class="modal-row"><b>Email :</b><div>${safe(lead.email)}</div></div>
-          <div class="modal-row"><b>Téléphone :</b><div>${safe(lead.phone)}</div></div>
-          <div class="modal-row"><b>Service :</b><div>${safe(lead.service)}</div></div>
-          <div class="modal-row"><b>Statut :</b><div>${safe(lead.status)}</div></div>
-          <div class="modal-row"><b>Date :</b><div>${fmt(lead.created_at)}</div></div>
-          <div style="margin-top:10px"><b>Message :</b><div style="white-space:pre-wrap;margin-top:6px">${safe(lead.message)}</div></div>
+          <div><b>Nom :</b> ${safe(lead.fullname)}</div>
+          <div><b>Email :</b> ${safe(lead.email)}</div>
+          <div><b>Téléphone :</b> ${safe(lead.phone)}</div>
+          <div><b>Service :</b> ${safe(lead.service)}</div>
+          <div><b>Statut :</b> ${safe(lead.status)}</div>
+          <div><b>Date :</b> ${fmt(lead.created_at)}</div>
+          <div style="margin-top:10px"><b>Message :</b><div style="white-space:pre-wrap">${safe(lead.message)}</div></div>
         `;
         modal.classList.add("active");
       }
-    
-      document.getElementById("closeLeadModal").onclick = ()=>document.getElementById("leadModal").classList.remove("active");
-      document.getElementById("closeLeadModal2").onclick = ()=>document.getElementById("leadModal").classList.remove("active");
-      document.getElementById("leadModal").onclick = e=>{
-        if(e.target.id==="leadModal") e.target.classList.remove("active");
-      };
-    
+
+      document.getElementById("closeLeadModal").onclick = () => leadModal.classList.remove("active");
+      document.getElementById("closeLeadModal2").onclick = () => leadModal.classList.remove("active");
+
       searchInput.oninput = render;
       filterStatus.onchange = render;
-      bindDeleteButtons();
-      bindViewButtons(leads);
-      render();
-    
-    })();
-  </script>
 
+      render();
+    })();
+    </script>
+  
   <style>
     .danger {
-      background: linear-gradient(135deg, #ff4d4d, #e60000);
+      background: linear-gradient(135deg, #ff4d4d, #d60000);
       color: #fff;
       border: none;
       padding: 10px 14px;
@@ -529,12 +493,12 @@
     }
 
     .danger:hover {
-      transform: scale(1.04);
+      transform: scale(1.05);
       box-shadow: 0 10px 20px rgba(255,0,0,0.35);
     }
 
     .danger:active {
-      transform: scale(0.96);
+      transform: scale(0.95);
     }
 
     /* ===== Responsive Table ===== */
@@ -672,6 +636,12 @@
         border-radius: 14px;
         font-size: 15px;
       }
+    }
+    .mobile-leads { display: none; }
+
+    @media (max-width: 768px) {
+      #leadsTable { display: none; }
+      .mobile-leads { display: block; }
     }
   </style>
     <!-- ========== Admin Footer ========== -->
