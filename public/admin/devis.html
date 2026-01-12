@@ -29,17 +29,19 @@
     }
     /* ===== HEADER ===== */
     .topbar {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:18px 40px;
-      background:#000;
-      color:#fff;
-      box-shadow:0 5px 25px rgba(0,0,0,0.2);
-      position:sticky;
-      top:0;
-      z-index:1000;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 40px;
+      background: #000;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+      font-family: 'Poppins', sans-serif;
     }
+
     .brand {
       display: flex;
       align-items: center;
@@ -61,10 +63,11 @@
       -webkit-text-fill-color: transparent;
     }
     .brand img { width:50px; height:auto; }
-    .nav {
-      display:flex;
-      gap:26px;
-      align-items:center;
+    .desktop-nav {
+      display: flex;
+      gap: 28px;
+      margin-left: auto;
+      align-items: center;
     }
     .nav-link {
       color:#fff;
@@ -287,12 +290,12 @@
     }
 
     @media (max-width: 900px) {
-      .menu-toggle {
-        display: block;
+      .desktop-nav {
+        display: none;
       }
 
-      .nav:not(.mobile-nav) {
-        display: none;
+      .menu-toggle {
+        display: block;
       }
     }
 
@@ -309,15 +312,27 @@
       <span class="brand-name">Admin COR'BAT</span>
     </div>
   
+    <!-- Desktop menu -->
+    <nav class="nav desktop-nav">
+      <a href="dashboard.html" class="nav-link">Tableau de bord</a>
+      <a href="devis.html" class="nav-link">Liste devis</a>
+      <a href="leads.html" class="nav-link">Clients intéressés</a>
+      <a href="projects.html" class="nav-link">Projets récents</a>
+      <a href="services.html" class="nav-link">Nos services</a>
+      <a href="callbacks.html" class="nav-link">Demandes de rappel</a>
+  
+      <button id="btnLogout" class="btn-logout">Se déconnecter</button>
+    </nav>
+  
     <!-- Bouton mobile -->
     <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
   
     <!-- Overlay -->
     <div class="mobile-menu-overlay" id="mobileOverlay"></div>
   
-    <!-- Menu -->
-    <nav class="nav mobile-nav" id="mobileMenu" role="navigation" aria-label="Main navigation">
-      <button class="close-menu" id="closeMenu" aria-label="Fermer le menu">✕</button>
+    <!-- Mobile menu -->
+    <nav class="mobile-nav" id="mobileMenu">
+      <button class="close-menu" id="closeMenu">✕</button>
   
       <a href="dashboard.html" class="nav-link">Tableau de bord</a>
       <a href="devis.html" class="nav-link">Liste devis</a>
@@ -327,7 +342,7 @@
       <a href="callbacks.html" class="nav-link">Demandes de rappel</a>
   
       <div class="admin-actions-mobile">
-        <button id="btnLogout" class="btn-logout">Se déconnecter</button>
+        <button id="btnLogoutMobile" class="btn-logout">Se déconnecter</button>
       </div>
     </nav>
   </header>
@@ -654,19 +669,19 @@
     const mobileMenu = document.getElementById("mobileMenu");
     const closeMenu = document.getElementById("closeMenu");
     const overlay = document.getElementById("mobileOverlay");
-
+    
     menuToggle.addEventListener("click", () => {
       mobileMenu.classList.add("active");
       overlay.classList.add("active");
     });
-
+    
     closeMenu.addEventListener("click", closeMobileMenu);
     overlay.addEventListener("click", closeMobileMenu);
-
+    
     function closeMobileMenu() {
       mobileMenu.classList.remove("active");
       overlay.classList.remove("active");
     }
-  </script>
+    </script>
 </body>
 </html>
