@@ -8,6 +8,15 @@
   <link rel="icon" type="image/png" href="../favicon.png">
   <style>
     /* Styles spécifiques à l'admin services (compact) */
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
     body { font-family: 'Poppins',sans-serif; background: #f6f7fb; color:#111;}
     .container { max-width:1100px; margin:0 auto; }
     .card { background:#fff; padding:18px; border-radius:12px; box-shadow:0 6px 18px rgba(12,12,20,0.06); margin-bottom:18px; }
@@ -53,10 +62,9 @@
         @media (max-width: 768px) {
           .container {
             max-width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin: 0 auto;
           }
-
           .grid {
             grid-template-columns: 1fr;
           }
@@ -213,9 +221,10 @@
         /* Mobile */
         @media (max-width: 768px) {
           .grid {
+            display: grid;
             grid-template-columns: 1fr;
+            gap: 16px;
           }
-
           .svc-row {
             flex-direction: column;
             align-items: stretch;
@@ -288,24 +297,22 @@
           }
         }
         .svc-card {
-          background: #fff;
-          border-radius: 14px;
-          padding: 14px;
-          box-shadow: 0 6px 18px rgba(0,0,0,0.06);
           display: flex;
           flex-direction: column;
           gap: 10px;
+          width: 100%;
         }
 
         .svc-head {
           display: flex;
           gap: 12px;
           align-items: center;
+          flex-wrap: wrap;
         }
 
         .svc-thumb {
-          width: 60px;
-          height: 60px;
+          width: 56px;
+          height: 56px;
           border-radius: 12px;
           object-fit: cover;
           flex-shrink: 0;
@@ -313,22 +320,24 @@
 
         .svc-info {
           flex: 1;
+          min-width: 0;
         }
 
         .svc-title {
           font-weight: 700;
           font-size: 1rem;
-        }
-
-        .svc-price {
-          font-size: 0.9rem;
-          color: #666;
+          word-wrap: break-word;
         }
 
         .svc-desc {
           font-size: 0.95rem;
           color: #444;
-          line-height: 1.4;
+          word-wrap: break-word;
+        }
+
+        .svc-price {
+          font-size: 0.9rem;
+          color: #666;
         }
 
         .svc-actions {
@@ -339,6 +348,7 @@
         .svc-actions button {
           flex: 1;
         }
+
         .btn {
           padding: 12px;
           border-radius: 10px;
@@ -363,6 +373,16 @@
           color: white;
           font-weight: 700;
         }
+        .mobile-card {
+          background: #fff;
+          border-radius: 16px;
+          padding: 16px;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+          width: 100%;
+          max-width: 100%;
+          overflow: hidden;
+        }
+
   </style>
 </head>
 <body>
@@ -583,7 +603,33 @@
         display: block;
       }
     }
+    form {
+      width: 100%;
+    }
 
+    form > div {
+      width: 100%;
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      max-width: 100%;
+    }
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 600px) {
+      .form-row {
+        flex-direction: row;
+      }
+
+      .form-row > div {
+        width: 50%;
+      }
+    }
   </style>
 
   <main class="container">
@@ -594,7 +640,7 @@
 
     <div class="grid">
       <!-- Right: Formulaire d'ajout / edition -->
-      <aside class="card">
+      <aside class="card mobile-card">
         <h3 id="formTitle">Ajouter un service</h3>
 
         <form id="serviceForm">
@@ -615,7 +661,7 @@
             <textarea id="svcDesc" name="description" placeholder="Détail du service..."></textarea>
           </div>
 
-          <div class="two-cols">
+          <div class="form-row">
             <div style="flex:1">
               <label for="svcPrice">Étiquette / Prix (facultatif)</label>
               <input id="svcPrice" name="price" type="text" placeholder="Ex : 120 000 Ar"/>
@@ -642,7 +688,7 @@
       </aside>
 
       <!-- Left: Liste & recherche -->
-      <div class="card">
+      <div class="svc-card mobile-card">
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
           <input id="searchInput" class="search" placeholder="Rechercher par titre / description..." />
           <button id="refreshBtn" class="btn btn-modraf" title="Rafraîchir">Rafraîchir</button>
