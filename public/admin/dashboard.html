@@ -271,20 +271,23 @@
 
     <section class="card" style="margin-top:20px;">
       <h3>Membres de l'équipe</h3>
-      <div style="margin-bottom:15px;">
+      <div style="margin-bottom:15px; display:flex; flex-wrap:wrap; gap:8px;">
         <input id="teamName" placeholder="Nom" class="input" />
         <input id="teamRole" placeholder="Rôle" class="input" />
-        <button id="addTeamBtn" class="btn-primary">Ajouter</button>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; width:100%;">
+          <button id="addTeamBtn" class="btn-primary">Ajouter</button>
         <button id="resetBtn" class="btn-secondary" style="display:none; color: #ffffff; background-color: red; padding: 13px; font-weight: bold; border-color: #000000;">
           Réinitialiser
         </button>
       </div>
-      <table class="table" id="teamTable">
+      <div class="table-wrapper">
+        <table class="table" id="teamTable">      
         <thead>
           <tr><th>Nom</th><th>Rôle</th><th>Actions</th></tr>
         </thead>
         <tbody></tbody>
       </table>
+    </div>
     </section>
 
     <script>
@@ -407,6 +410,93 @@
       }
       #resetBtn:hover {
         background: #eee;
+      }
+      /* ================= MOBILE RESPONSIVE ================= */
+
+      @media (max-width: 768px) {
+
+      main.container.section {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      .card h3 {
+        font-size: 1.1rem;
+      }
+
+      /* KPI */
+      .card h3 {
+        font-size: 1.6rem;
+      }
+
+      /* Inputs full width */
+      .input {
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      button {
+        width: 100%;
+        margin-top: 8px;
+      }
+
+      #saveCountBtn {
+        width: 100%;
+      }
+
+      /* Preview images */
+      #previewImages {
+        justify-content: center;
+      }
+
+      .img-container {
+        width: 100px;
+        height: 75px;
+      }
+
+      /* Table responsive */
+      .table-wrapper {
+        overflow-x: auto;
+      }
+
+      .table {
+        min-width: 500px;
+      }
+
+      /* Action buttons */
+      .action-btn {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+      }
+
+      /* Chart responsive */
+      #adminChart {
+        height: 200px !important;
+      }
+
+      /* Section spacing */
+      section.card {
+        margin-top: 14px !important;
+      }
+
+      /* Team form buttons */
+      #resetBtn {
+        width: 100%;
+        margin-left: 0;
+      }
       }
     </style>
     
