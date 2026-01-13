@@ -296,9 +296,7 @@
         <div class="hero-actions">
           <a class="btn-primary" href="devis.html">Demander un devis</a>
           <a class="btn-secondary" href="#services">Voir nos services</a>
-          <button id="installBtn" class="btn-primary" style="display:none;">
-            📲 Installer COR’BAT
-          </button>
+
         </div>
       </div>
     
@@ -1107,42 +1105,63 @@
     }
 
     /* ===============================
-      SERVICES — SWIPE LIBRE (APP)
-      =============================== */
-    @media (max-width: 768px) {
+        SERVICES — MOBILE SIMPLE & RAPIDE
+        =============================== */
+      @media (max-width: 768px) {
 
-    .grid-2 {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 24px;
-    }
+      .grid-2 {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px;
+        padding: 0 16px;
+        overflow: visible !important;
+      }
 
-    .grid-2 {
-      scroll-snap-type: y mandatory;
-      overflow-y: auto;
-      max-height: 100vh;
-    }
+      .grid-2 > .service-card {
+        width: 100%;
+        min-height: auto !important;
+        scroll-snap-align: none !important;
+      }
 
-    .grid-2 > .service-card {
-      scroll-snap-align: start;
-      min-height: 90vh;
-    }
+      .service-card img {
+        height: 180px;
+      }
 
-    /* Effet de glisse douce */
-    .grid-2 {
-      scroll-padding-left: 16px;
-      scroll-padding-right: 16px;
-    }
+      .service-card h3 {
+        font-size: 1.2rem;
+      }
 
-    /* Ombre dynamique */
-    .service-card {
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
+      .service-card ul {
+        font-size: 0.95rem;
+      }
 
-    .service-card:active {
-      transform: scale(0.97);
-    }
-    }
+      .service-card .card-actions button {
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+      }
+
+      .service-premium {
+        display: block !important;
+      }
+
+      .service-premium .svc-media {
+        height: 200px;
+      }
+
+      .service-premium .svc-content {
+        padding: 20px;
+      }
+
+      .service-premium .card-actions {
+        flex-direction: column;
+      }
+
+      .service-premium .card-actions button {
+        width: 100%;
+      }
+      }
+
     </style>
 
     <script>
