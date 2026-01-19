@@ -287,7 +287,7 @@
     <section class="hero container">
       <!-- Logo unique animé en puzzle -->
       <div class="hero-bg">
-        <img src="images/Corbatfond.png" alt="COR'BAT" class="hero-bg-logo" id="puzzleLogo">
+        <img src="images/COR'BAT.jpg" alt="COR'BAT" class="hero-bg-logo" id="puzzleLogo">
       </div>
     
       <div class="hero-left">
@@ -1104,63 +1104,7 @@
       }
     }
 
-    /* ===============================
-        SERVICES — MOBILE SIMPLE & RAPIDE
-        =============================== */
-      @media (max-width: 768px) {
-
-      .grid-2 {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 20px;
-        padding: 0 16px;
-        overflow: visible !important;
-      }
-
-      .grid-2 > .service-card {
-        width: 100%;
-        min-height: auto !important;
-        scroll-snap-align: none !important;
-      }
-
-      .service-card img {
-        height: 180px;
-      }
-
-      .service-card h3 {
-        font-size: 1.2rem;
-      }
-
-      .service-card ul {
-        font-size: 0.95rem;
-      }
-
-      .service-card .card-actions button {
-        width: 100%;
-        padding: 14px;
-        font-size: 1rem;
-      }
-
-      .service-premium {
-        display: block !important;
-      }
-
-      .service-premium .svc-media {
-        height: 200px;
-      }
-
-      .service-premium .svc-content {
-        padding: 20px;
-      }
-
-      .service-premium .card-actions {
-        flex-direction: column;
-      }
-
-      .service-premium .card-actions button {
-        width: 100%;
-      }
-      }
+    /* =============================== SERVICES — SWIPE LIBRE (APP) =============================== */ @media (max-width: 768px) { .grid-2 { display: flex !important; flex-direction: column !important; gap: 24px; } .grid-2 { scroll-snap-type: y mandatory; overflow-y: auto; max-height: 100vh; } .grid-2 > .service-card { scroll-snap-align: start; min-height: 90vh; } /* Effet de glisse douce */ .grid-2 { scroll-padding-left: 16px; scroll-padding-right: 16px; } /* Ombre dynamique */ .service-card { transition: transform 0.25s ease, box-shadow 0.25s ease; } .service-card:active { transform: scale(0.97); } }
 
     </style>
 
