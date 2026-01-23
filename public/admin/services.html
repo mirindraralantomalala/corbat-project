@@ -381,8 +381,8 @@
   <header class="topbar">
     <div class="brand">
       <span class="logo">
-        <img src="../images/COR'BAT.png" alt="COR'BAT">
-      </span>
+        <img src="../images/corbat.jpg" alt="Logo COR'BAT">
+      </span> 
       <span class="brand-name">Admin COR'BAT</span>
     </div>
   
@@ -444,18 +444,33 @@
       font-family: 'Poppins', sans-serif;
     }
 
+    /* Brand (logo + texte) */
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px; /* 👈 ESPACE entre logo et texte */
       font-weight: 700;
       font-size: 1.2rem;
     }
+
+    /* Conteneur du logo */
+    .brand .logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff; /* fond blanc propre autour du logo */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    /* Image du logo */
     .brand .logo img {
-      width: 48px;
-      height: auto;
-      display: inline-block;
-      vertical-align: middle;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* évite la déformation */
     }
     .brand .brand-name {
       font-size: 1.4rem;
@@ -885,7 +900,7 @@
     <div class="admin-footer-inner">
       <div class="admin-left">
         <div class="admin-brand">
-          <img src="../images/COR'BAT.png" alt="COR'BAT" />
+          <img src="../images/corbat.jpg" alt="COR'BAT" />
           <div>
             <strong>Admin COR'BAT</strong>
             <div class="small muted">Espace administrateur</div>
@@ -928,7 +943,23 @@
       flex-wrap:wrap;
     }
     .admin-left { display:flex; gap:14px; align-items:center; min-width:200px; }
-    .admin-brand img { width:44px; height:44px; object-fit:contain; border-radius:8px; }
+    /* Conteneur logo admin */
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Cercle autour du logo */
+    .admin-brand img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;        /* 🔵 rend le logo rond */
+      object-fit: cover;         /* évite l’écrasement */
+      background: #fff;          /* fond propre autour */
+      padding: 4px;              /* espace intérieur */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25); /* effet moderne */
+    }
     .admin-brand strong { display:block; color:#fff; }
     .small { font-size:0.87rem; }
     .muted { color:#a9a9a9; }

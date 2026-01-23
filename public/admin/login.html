@@ -26,7 +26,15 @@
     .auth-grid{width:100%;max-width:1100px;display:grid;grid-template-columns: 1fr 420px;gap:28px;align-items:center;}
     .panel{padding:36px;border-radius:var(--card-radius);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border: 1px solid var(--glass-border);box-shadow: 0 10px 40px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.01);backdrop-filter: blur(6px) saturate(120%);display:flex;flex-direction:column;gap:18px;}
     .brand{display:flex;gap:14px;align-items:center;}
-    .brand img{ width:56px; height:56px; object-fit:contain; border-radius:8px; }
+    .brand img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;        /* 🔵 rend le logo rond */
+      object-fit: cover;         /* évite l’écrasement */
+      background: #fff;          /* fond propre autour */
+      padding: 4px;              /* espace intérieur */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25); /* effet moderne */
+    }
     .brand h2{margin:0; font-size:1.4rem; letter-spacing:0.2px;background: #ffffff;-webkit-background-clip:text; -webkit-text-fill-color:transparent;}
     .panel p { margin:0; color:var(--muted); }
     .features { margin-top:8px; display:grid; gap:12px; }
@@ -187,7 +195,7 @@
     <div class="auth-grid" role="main">
       <aside class="panel" aria-labelledby="brandTitle">
         <div class="brand" id="brandTitle">
-          <img src="../images/COR'BAT.png" alt="COR'BAT">
+          <img src="../images/corbat.jpg" alt="COR'BAT">
           <div>
             <h2>COR'BAT</h2>
             <p>Construction • Rénovation • Design</p>
